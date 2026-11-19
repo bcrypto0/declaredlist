@@ -1,0 +1,11 @@
+# Keep LF line ends on every checkout: the scan data is committed by a Linux
+# job and compared as text, and a CRLF shebang would break direct execution on
+# Unix.
+* text=auto eol=lf
+*.js text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.css text eol=lf
+LICENSE text eol=lf
+NOTICE text eol=lf

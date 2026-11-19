@@ -1,0 +1,215 @@
+{
+  "schema": "declaredlist/scan-1",
+  "scanStartedAt": "2026-11-19T14:57:04.274Z",
+  "scanFinishedAt": "2026-11-19T14:57:11.860Z",
+  "durationSeconds": 8,
+  "resumed": 0,
+  "registry": "https://registry.modelcontextprotocol.io",
+  "coverage": {
+    "mode": "updated_since",
+    "since": "2026-11-19T12:36:11.373Z",
+    "lastFullPass": {
+      "startedAt": "2026-11-19T14:36:11.373Z",
+      "finishedAt": "2026-11-19T14:56:52.561Z",
+      "listingsScanned": 67587,
+      "withPublisherMetadata": 2703
+    }
+  },
+  "method": {
+    "list": "https://registry.modelcontextprotocol.io/v0/servers?version=latest&limit=100&updated_since=<time> (cursor paging)",
+    "listing": "https://registry.modelcontextprotocol.io/v0.1/servers/<name>/versions/<version> (read by the checker for each listing with a pointer)",
+    "maxRegistryRequestsPerSecond": 1,
+    "listIncludesPublisherMetadata": true
+  },
+  "checker": {
+    "name": "addon-declare",
+    "version": "0.2.0",
+    "source": "https://github.com/bcrypto0/addon-declaration",
+    "command": "check-listing --fetch-tools"
+  },
+  "counts": {
+    "listingsScanned": 351,
+    "pages": 4,
+    "rowsWithoutName": 0,
+    "withPublisherMetadata": 15,
+    "withPointer": 0,
+    "checked": 1,
+    "listed": 1,
+    "withdrawn": 0,
+    "byState": {
+      "verified_newer_declaration": 1
+    }
+  },
+  "listings": [
+    {
+      "name": "com.rtlpdf/arabic-pdf",
+      "version": "1.0.0",
+      "title": "RTL PDF",
+      "description": "Correctly shaped right-to-left PDFs for Arabic, Urdu and Persian text.",
+      "websiteUrl": "http[local path removed]",
+      "publishedAt": "2026-11-19T01:16:58.545256Z",
+      "registryStatus": "active",
+      "registryUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/com.rtlpdf%2Farabic-pdf/versions/1.0.0",
+      "pointerInList": true,
+      "checkedAt": "2026-11-19T14:57:08.419Z",
+      "durationMs": 3438,
+      "state": "verified_newer_declaration",
+      "exitCode": 11,
+      "reasons": [],
+      "pointer": {
+        "url": "https://rtlpdf.com/.well-known/addon-declaration/com.rtlpdf/arabic-pdf/by-hash/9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6.json",
+        "hash": "sha256:9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6"
+      },
+      "declarationNamed": {
+        "url": "https://rtlpdf.com/.well-known/addon-declaration/com.rtlpdf/arabic-pdf/by-hash/9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6.json",
+        "hash": "sha256:9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6",
+        "format": "addon-declaration/0.1",
+        "state": "valid"
+      },
+      "inForce": {
+        "source": "versions/1.0.0.json",
+        "url": "https://rtlpdf.com/.well-known/addon-declaration/com.rtlpdf/arabic-pdf/versions/1.0.0.json",
+        "hash": "sha256:919ed174f2c34c1ae788b5c05e56804a273ecc26fe80d6fc11375172ab3cd069",
+        "format": "addon-declaration/0.2",
+        "state": "valid"
+      },
+      "declaration": {
+        "issuedAt": "2026-11-19T03:14:55Z",
+        "expiresAt": "2027-05-18T03:14:55Z",
+        "keyMethod": "http",
+        "keyDomain": "rtlpdf.com",
+        "keyId": "sha256:57b47ffa643b43cc1dedebd1d2438bf5202551175eb289a39fb63e78e808e29c",
+        "alg": "ed25519",
+        "remotes": [
+          {
+            "type": "streamable-http",
+            "url": "https://rtlpdf.com/mcp"
+          }
+        ],
+        "previous": "sha256:9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6"
+      },
+      "keySource": "http: https://rtlpdf.com/.well-known/mcp-registry-auth",
+      "keyRecord": "MCPv1 record, registry login key",
+      "keyId": "sha256:57b47ffa643b43cc1dedebd1d2438bf5202551175eb289a39fb63e78e808e29c",
+      "alg": "ed25519",
+      "tools": {
+        "check": "run",
+        "result": "match",
+        "source": "remote",
+        "remote": "https://rtlpdf.com/mcp",
+        "protocolVersion": "2026-07-28",
+        "era": "modern",
+        "pages": 1,
+        "reason": null
+      },
+      "toolSetDigest": {
+        "contract": {
+          "result": "match",
+          "declared": "sha256-VPxDXBxVgGzH/0OtZBO1iGClgcDKQSgXmvDHsxe3YTU=",
+          "computed": "sha256-VPxDXBxVgGzH/0OtZBO1iGClgcDKQSgXmvDHsxe3YTU="
+        },
+        "extras": {
+          "result": "match",
+          "declared": "sha256-+q4/BoqWmGGjGJw7VgeYkxe99dw6scmRsiGkGhwP8n8=",
+          "computed": "sha256-+q4/BoqWmGGjGJw7VgeYkxe99dw6scmRsiGkGhwP8n8="
+        },
+        "comparable": true
+      },
+      "newer": [
+        {
+          "path": "versions/1.0.0.json",
+          "result": "in_force",
+          "hash": "sha256:919ed174f2c34c1ae788b5c05e56804a273ecc26fe80d6fc11375172ab3cd069",
+          "format": "addon-declaration/0.2",
+          "reason": null
+        },
+        {
+          "path": "latest.json",
+          "result": "in_force",
+          "hash": "sha256:919ed174f2c34c1ae788b5c05e56804a273ecc26fe80d6fc11375172ab3cd069",
+          "format": "addon-declaration/0.2",
+          "reason": "the same declaration as versions/1.0.0.json"
+        }
+      ],
+      "chain": [
+        {
+          "hash": "sha256:919ed174f2c34c1ae788b5c05e56804a273ecc26fe80d6fc11375172ab3cd069",
+          "format": "addon-declaration/0.2",
+          "issuedAt": "2026-11-19T03:14:55Z"
+        },
+        {
+          "hash": "sha256:9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6",
+          "format": "addon-declaration/0.1",
+          "issuedAt": "2026-11-19T00:08:46Z"
+        }
+      ],
+      "checked": [
+        "the served declaration is the one the listing names (its declaration hash equals the pointer hash)",
+        "the listing name and version equal the declaration's",
+        "the listing's remotes equal the declared remotes (https://rtlpdf.com/mcp)",
+        "a newer declaration for this version (versions/1.0.0.json) follows the one the listing names in 1 link under the same key, and declares the same remotes",
+        "declaration in force: name: namespace covered by an http key at rtlpdf.com",
+        "declaration in force: signature",
+        "declaration in force: time window",
+        "declaration in force: tool set digest (mcp-tool-set-digest/1): contract and extras",
+        "declaration in force: chain link to previous declaration",
+        "declaration in force: signature of previous declaration (same key)"
+      ],
+      "notChecked": [],
+      "notes": [
+        "format changed from addon-declaration/0.1 to addon-declaration/0.2: the earlier declaration pins its tools with toolsHash, this one with the two digests of mcp-tool-set-digest/1; the two cannot be compared without the tool lists (SPEC.md section 4a)"
+      ],
+      "requests": [
+        {
+          "purpose": "registry listing",
+          "method": "GET",
+          "rpc": null,
+          "url": "https://registry.modelcontextprotocol.io/v0.1/servers/com.rtlpdf%2Farabic-pdf/versions/1.0.0",
+          "status": 200,
+          "error": null
+        },
+        {
+          "purpose": "declaration named by the listing",
+          "method": "GET",
+          "rpc": null,
+          "url": "https://rtlpdf.com/.well-known/addon-declaration/com.rtlpdf/arabic-pdf/by-hash/9170020c77a92f039806c11f714d1aa6eb50780bdb90c27e52016958045baca6.json",
+          "status": 200,
+          "error": null
+        },
+        {
+          "purpose": "key lookup (http)",
+          "method": "GET",
+          "rpc": null,
+          "url": "https://rtlpdf.com/.well-known/mcp-registry-auth",
+          "status": 200,
+          "error": null
+        },
+        {
+          "purpose": "newer declaration (versions/1.0.0.json)",
+          "method": "GET",
+          "rpc": null,
+          "url": "https://rtlpdf.com/.well-known/addon-declaration/com.rtlpdf/arabic-pdf/versions/1.0.0.json",
+          "status": 200,
+          "error": null
+        },
+        {
+          "purpose": "newer declaration (latest.json)",
+          "method": "GET",
+          "rpc": null,
+          "url": "https://rtlpdf.com/.well-known/addon-declaration/com.rtlpdf/arabic-pdf/latest.json",
+          "status": 200,
+          "error": null
+        },
+        {
+          "purpose": "mcp tools/list",
+          "method": "POST",
+          "rpc": "tools/list",
+          "url": "https://rtlpdf.com/mcp",
+          "status": 200,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "withdrawn": []
+}

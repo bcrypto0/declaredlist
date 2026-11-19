@@ -1,0 +1,19 @@
+declaredlist.com scanner and static site
+Copyright 2026 the declaredlist.com authors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The scanner imports addon-declare, the public checker
+(https://github.com/bcrypto0/addon-declaration), by path at run time. Its code
+is not copied into this repository; it is licensed under the Apache License,
+Version 2.0 by the addon-declaration authors.
+
+The text of the publishers page (build/core.js, publishersPage) is adapted
+from the README of addon-declaration (https://github.com/bcrypto0/addon-declaration),
+licensed under the Apache License, Version 2.0 by the addon-declaration authors.
+
+The files in data/ hold results of checks and text read from other parties.
+Listing names, titles, descriptions and URLs come from the public API of the
+official MCP Registry; declarations and key records come from publishers'
+domains. That text belongs to its publishers and is reproduced as read,
+cleaned and shortened, for reference.

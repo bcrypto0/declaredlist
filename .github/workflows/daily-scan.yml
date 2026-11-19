@@ -1,0 +1,191 @@
+# Daily scan for declaredlist.com.
+#
+# Once a day: check out this repository and the public checker at a pinned
+# commit, run the tests, run one scan, build the site from the new data as a
+# check, and commit data/ back to main. That push makes Cloudflare Pages build
+# and serve the site through its Git integration (build command
+# node build/build.js, output folder dist); no deploy token or other secret is
+# stored in this repository.
+#
+# Every run changes data/status.json (the time and outcome of the attempt), so
+# every run makes a commit, and the schedule stays active. A scan that fails or
+# stops leaves data/latest.json as it was (the scanner fails closed) and
+# records the reason in data/status.json; the site then shows the last complete
+# scan with a notice. Failed tests, and data the site build refuses, are
+# recorded the same way.
+#
+# data/ on main is written by this job only. A hand edit to data/ pushed while
+# a run is going makes that run's push fail (its rebase stops on the conflict);
+# the next run repeats the scan from the data on main.
+
+name: daily scan
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch: {}
+
+env:
+  # The public checker, pinned to a full commit SHA (f58225a, "Add
+  # check-listing: verify a registry listing end to end"). Move it on purpose,
+  # after reading the checker's changes, and in test.yml as well.
+  CHECKER_REPOSITORY: bcrypto0/addon-declaration
+  CHECKER_SHA: f58225ad3fb56f90fb0acfb657a2bcad3c0df100
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    # A manual start from another branch would run that branch's copy of this
+    # file and push its data to main; only main runs.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      # The site and the checker sit side by side, so the test runner in site/
+      # does not pick up the checker's own tests. The token is not kept in
+      # site/.git/config: the tests and the scan read untrusted input from the
+      # registry, publishers' domains and remote servers, and only the commit
+      # step below needs to push.
+      - name: Check out the site
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          path: site
+          persist-credentials: false
+
+      - name: Check out the public checker
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ env.CHECKER_REPOSITORY }}
+          ref: ${{ env.CHECKER_SHA }}
+          path: checker
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      # Progress of a scan that stopped (data/.scan/) is kept in the Actions
+      # cache, not in the repository, and restored here so this run continues
+      # it. It is saved again right after the scan step, whatever the outcome.
+      # The key names the attempt too, so a rerun of a run saves its own entry
+      # and the next run restores the newest one.
+      - name: Restore scan progress
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: site/data/.scan
+          key: scan-progress-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: scan-progress-
+
+      - name: Test
+        id: test
+        run: node --test
+        env:
+          DECLARED_CHECKER_DIR: ${{ github.workspace }}/checker
+
+      # Failed tests stop the scan. The failure goes into data/status.json, so
+      # the front page shows it and the day still makes a commit.
+      - name: Record failed tests
+        if: always() && steps.test.outcome == 'failure'
+        run: node scan/record-failure.js --phase tests --reason 'the tests of the scanner and the site failed; no scan was run'
+
+      # scan/next-pass.js chooses the pass: a full pass that stopped and can
+      # still be continued comes first; a full pass also runs on Sundays (UTC)
+      # and when no published scan rests on one; otherwise only listings
+      # published or changed since the last scan are read (--since auto), and
+      # every listing shown before is checked again. Saved progress that the
+      # scanner would no longer continue does not start a full pass on a weekday.
+      - name: Scan
+        id: scan
+        continue-on-error: true
+        run: |
+          pass="$(node scan/next-pass.js)"
+          if [ "$pass" = "full" ]; then
+            node scan/scan.js --max-minutes 60
+          else
+            node scan/scan.js --since auto --max-minutes 30
+          fi
+        env:
+          DECLARED_CHECKER_DIR: ${{ github.workspace }}/checker
+
+      # Saved whatever the scan gave. The marker file makes the folder exist and
+      # be saved also when a finished scan left no progress, so an older cache
+      # entry with stale progress is not restored by the next run.
+      - name: Save scan progress
+        if: always() && steps.test.outcome == 'success'
+        continue-on-error: true
+        run: |
+          mkdir -p data/.scan
+          date -u +%Y-%m-%dT%H:%M:%SZ > data/.scan/cache-marker
+      - name: Upload scan progress to the cache
+        if: always() && steps.test.outcome == 'success'
+        continue-on-error: true
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: site/data/.scan
+          key: scan-progress-${{ github.run_id }}-${{ github.run_attempt }}
+
+      # The same build Cloudflare Pages runs after the push, written outside the
+      # checkout. Data the build refuses is not pushed: data/latest.json,
+      # data/history/ and data/status.json go back to main's copy, and the
+      # failure is recorded, so the site keeps the last complete scan and shows
+      # a notice instead of failing to deploy.
+      - name: Build the site from the new data
+        id: build
+        if: always() && steps.test.outcome == 'success'
+        run: |
+          if node build/build.js --out "$RUNNER_TEMP/dist-check"; then
+            exit 0
+          fi
+          git checkout -- data/latest.json data/status.json data/history
+          git clean -fdq -- data/history
+          node scan/record-failure.js --phase build --kind rejected --reason 'the site could not be built from the data this scan wrote; the scan was not published'
+          echo "the site could not be built from the new data; it was not published"
+          exit 1
+
+      # data/latest.json, data/status.json and data/history/ are the record of
+      # what was found. data/.scan/ is ignored by .gitignore. The token is given
+      # to git for this step only.
+      - name: Commit data
+        if: always() && (steps.test.outcome == 'success' || steps.test.outcome == 'failure')
+        env:
+          SCAN_OUTCOME: ${{ steps.test.outcome == 'success' && steps.scan.outcome || 'tests failed' }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git add -A -- data
+          if git diff --cached --quiet; then
+            echo "data/ did not change"
+            exit 0
+          fi
+          git commit -q -m "Scan $(date -u +%Y-%m-%dT%H:%MZ): $SCAN_OUTCOME"
+          for attempt in 1 2 3; do
+            if git -c http.https://github.com/.extraheader="$auth" push origin HEAD:main; then
+              exit 0
+            fi
+            if ! git -c http.https://github.com/.extraheader="$auth" pull --rebase origin main; then
+              git rebase --abort || true
+              echo "data/ on main changed during this run; the commit was not pushed"
+              exit 1
+            fi
+          done
+          echo "the data commit could not be pushed"
+          exit 1
+
+      - name: Report a failed scan or build
+        if: always() && (steps.scan.outcome == 'failure' || steps.build.outcome == 'failure')
+        run: |
+          echo "The scan failed or stopped, or its data could not be built; data/status.json has the reason."
+          exit 1

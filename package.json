@@ -1,0 +1,23 @@
+{
+  "name": "declaredlist-site",
+  "version": "0.1.0",
+  "description": "Scanner and static site for declaredlist.com: registry listings that point to an add on declaration, with dated check results.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "scan": "node scan/scan.js",
+    "build": "node build/build.js",
+    "test": "node --test"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcrypto0/declaredlist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bcrypto0/declaredlist/issues"
+  }
+}

@@ -1,0 +1,24 @@
+# Build output: Cloudflare Pages builds it from the repository.
+dist/
+dist.tmp-*/
+# Progress of an unfinished scan and the scan lock (kept in the Actions cache).
+data/.scan/
+# Temporary files of atomic writes.
+*.tmp-*
+# Scratch copies (for example a clean clone made to check the build).
+scratch*/
+node_modules/
+# Editors and operating systems.
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+# Local secrets, in case any are ever made here.
+.env
+.env.*
+*.pem
+*.key

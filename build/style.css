@@ -1,0 +1,86 @@
+/* declaredlist.com: one hand written stylesheet, system fonts, light and dark. */
+:root {
+  --bg: #fcfcfa;
+  --fg: #1c1c1a;
+  --muted: #5a5a55;
+  --rule: #d9d9d3;
+  --panel: #f2f2ee;
+  --link: #174d86;
+  --link-visited: #4f3a7a;
+  --mark: #7a5a00;
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131312;
+    --fg: #e7e7e2;
+    --muted: #a5a59e;
+    --rule: #34342f;
+    --panel: #1d1d1b;
+    --link: #8fbaf0;
+    --link-visited: #c0a9ec;
+    --mark: #e0b54a;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 1rem/1.55 var(--sans);
+}
+.wrap { max-width: 52rem; margin: 0 auto; padding: 0 1rem; }
+header.site { border-bottom: 2px solid var(--fg); padding: 1rem 0 0.6rem; }
+header.site .wrap { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1.2rem; }
+.brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.02em; color: var(--fg); text-decoration: none; }
+.brand small { font-weight: 400; color: var(--muted); font-size: 0.85rem; letter-spacing: 0; margin-left: 0.4rem; }
+nav.site { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font-size: 0.95rem; }
+nav.site a { color: var(--fg); }
+main { padding: 1.2rem 0 2rem; overflow-wrap: break-word; }
+main p, main strong, .lead, .notice { overflow-wrap: anywhere; }
+.skip { position: absolute; left: -10000px; top: 0; }
+.skip:focus { left: 1rem; top: 0.5rem; background: var(--bg); color: var(--link); padding: 0.3rem 0.6rem; border: 2px solid var(--fg); z-index: 1; }
+h1 { font-size: 1.55rem; line-height: 1.25; margin: 0.4rem 0 0.8rem; overflow-wrap: anywhere; }
+h2 { font-size: 1.15rem; margin: 2rem 0 0.6rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1rem; margin: 1.4rem 0 0.4rem; }
+p, ul, ol, dl, table, pre { margin: 0 0 1rem; }
+a { color: var(--link); text-underline-offset: 0.15em; }
+a:visited { color: var(--link-visited); }
+code, pre, .mono { font-family: var(--mono); font-size: 0.88em; }
+code { overflow-wrap: anywhere; }
+pre { background: var(--panel); border: 1px solid var(--rule); padding: 0.75rem; overflow-x: auto; white-space: pre; line-height: 1.45; }
+.lead { font-size: 1.05rem; }
+.muted, .note { color: var(--muted); }
+.notice { border: 1px solid var(--rule); border-left: 4px solid var(--mark); background: var(--panel); padding: 0.6rem 0.8rem; margin: 0 0 1.2rem; }
+.url { overflow-wrap: anywhere; font-family: var(--mono); font-size: 0.88em; }
+dl.facts { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr; gap: 0.35rem 1rem; }
+dl.facts dt { color: var(--muted); }
+dl.facts dd { margin: 0; overflow-wrap: anywhere; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); margin: 0 0 1rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; margin: 0; }
+th, td { text-align: left; vertical-align: top; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); }
+thead th { background: var(--panel); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+td.name { overflow-wrap: anywhere; min-width: 10rem; }
+.state { font-family: var(--mono); font-size: 0.85em; }
+ul.plain { padding-left: 1.2rem; }
+ul.plain li { margin: 0.15rem 0; overflow-wrap: anywhere; }
+ol.steps > li { margin: 0 0 0.8rem; }
+footer.site { border-top: 1px solid var(--rule); padding: 1rem 0 2rem; font-size: 0.9rem; color: var(--muted); }
+footer.site p { margin: 0 0 0.5rem; }
+@media (max-width: 34rem) {
+  h1 { font-size: 1.35rem; }
+  dl.facts { grid-template-columns: 1fr; gap: 0.1rem; }
+  dl.facts dd { margin-bottom: 0.6rem; }
+  /* Tables keep their table layout (and so their meaning for screen readers);
+     a wide one scrolls inside its frame, not the page. */
+  th, td { padding: 0.4rem 0.45rem; }
+  td.name { min-width: 8rem; }
+}
+@media print {
+  header.site nav, footer.site { display: none; }
+  a { color: inherit; }
+}
