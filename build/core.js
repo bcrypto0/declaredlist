@@ -277,6 +277,19 @@ function publishersPage() {
   const body = `<h1>Publishing a declaration</h1>
 <p class="lead">A short path, taken from the README of the public checker. The README and the spec are the full reference: ${httpsLink(README_URL, 'README')}, ${httpsLink(SPEC_URL, 'SPEC.md')}.</p>
 <p>You need a server published under a domain namespace (such as <code>com.example/weather</code>) with <code>mcp-publisher login dns</code> or <code>mcp-publisher login http</code>, and the private key you made for that login. Names under <code>io.github</code> are out of scope, because no domain key can prove them. The checker needs Node 20 or later and has no dependencies, so nothing needs installing.</p>
+<h2>The short way: one command</h2>
+<p>If your server is already listed in the registry, the checker can do the reading, signing and checking in one run. Clone it as in step 0 below, then, from the folder that holds your server.json, give the name of your listing and the version you are about to publish:</p>
+<pre><code>${esc(TOOL)} prepare com.example/weather --for-version 1.4.1 --key-env MCP_PRIVATE_KEY</code></pre>
+<p>The version must be a new one, because a published version cannot be changed. The run reads your listing and your key record, reads the tool list from your running server, and stops before signing if the private key is not the one you published. It links your last declaration, signs the new one, checks the result, and writes a folder <code>addon-declaration-out</code> with:</p>
+<ul class="plain">
+<li><code>site/</code>: the files to upload to your domain, at the paths they already have inside that folder;</li>
+<li><code>pointer.json</code>: the block to put into the server.json of the new version;</li>
+<li><code>NEXT_STEPS.txt</code>: the upload addresses, the edit to server.json, the publish step and the command that checks the listing afterwards.</li>
+</ul>
+<p>Add <code>--dry-run</code> to see what it would do without signing anything. If the new version changes your tools or your remotes, give <code>--tools</code> and <code>--server-json</code> for that build, as the README describes. After you publish the version with <code>mcp-publisher</code>, check the listing as this site does:</p>
+<pre><code>${esc(TOOL)} check-listing com.example/weather --fetch-tools</code></pre>
+<h2>The same steps by hand</h2>
+<p>For a server that is not listed yet, or to run each step yourself.</p>
 <ol class="steps" start="0">
 <li><p>Get the checker. From the folder above the one that holds your server.json, clone it, so that it sits next to that folder:</p>
 <pre><code>git clone ${esc(CHECKER_SOURCE)}</code></pre>
@@ -307,7 +320,7 @@ function publishersPage() {
 </ol>
 <p class="muted">Publishing a declaration is free and needs no account with this site. The site lists what the registry serves and what the check finds; it does not accept or remove listings by request.</p>
 `;
-  return layout({ title: 'Publishing a declaration | Declared', description: 'How a publisher signs an add on declaration with the public checker and points to it from a registry listing.', body, canonical: 'publishers' });
+  return layout({ title: 'Publishing a declaration | Declared', description: 'How a publisher signs an add on declaration with the public checker, in one command or step by step, and points to it from a registry listing.', body, canonical: 'publishers' });
 }
 
 function methodPage(latest) {

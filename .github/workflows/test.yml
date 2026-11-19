@@ -13,7 +13,7 @@ on:
 env:
   # The public checker at the same pinned commit as daily-scan.yml.
   CHECKER_REPOSITORY: bcrypto0/addon-declaration
-  CHECKER_SHA: f58225ad3fb56f90fb0acfb657a2bcad3c0df100
+  CHECKER_SHA: f65cc456142f4a204d4ceda1b7141a52ca1ececc
 
 permissions:
   contents: read

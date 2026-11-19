@@ -279,7 +279,10 @@ test('the site text claims no more than the data shows', () => {
   assert.doesNotMatch(pub, /&lt;hash&gt;/, 'one placeholder for the hash');
   // Every command of the guide calls the checker by its path, not as bin/ in the publisher's folder.
   const cmds = [...pub.matchAll(/<pre><code>([^<]*addon-declare\.js[^<]*)<\/code><\/pre>/g)].map((m) => m[1]);
-  assert.equal(cmds.length, 4);
+  assert.equal(cmds.length, 6);
+  assert.match(cmds[0], / prepare com\.example\/weather --for-version 1\.4\.1 --key-env MCP_PRIVATE_KEY$/);
+  assert.match(pub, /<h2>The short way: one command<\/h2>/);
+  assert.match(pub, /stops before signing if the private key is not the one you published/);
   for (const c of cmds) assert.match(c, /^node \.\.\/addon-declaration\/bin\/addon-declare\.js /, c);
   const page = read('listing/com.example__weather.html');
   assert.match(page, /or the checker changed since 19 November 2026 \(this result used addon-declare 0\.2\.0\)/);

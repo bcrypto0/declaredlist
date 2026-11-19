@@ -26,11 +26,11 @@ on:
   workflow_dispatch: {}
 
 env:
-  # The public checker, pinned to a full commit SHA (f58225a, "Add
-  # check-listing: verify a registry listing end to end"). Move it on purpose,
+  # The public checker, pinned to a full commit SHA (f65cc45, "Add
+  # prepare: make a declaration for a listing in one command"). Move it on purpose,
   # after reading the checker's changes, and in test.yml as well.
   CHECKER_REPOSITORY: bcrypto0/addon-declaration
-  CHECKER_SHA: f58225ad3fb56f90fb0acfb657a2bcad3c0df100
+  CHECKER_SHA: f65cc456142f4a204d4ceda1b7141a52ca1ececc
 
 permissions:
   contents: write
