@@ -1,13 +1,13 @@
 {
   "schema": "declaredlist/scan-1",
-  "scanStartedAt": "2026-11-19T14:57:04.274Z",
-  "scanFinishedAt": "2026-11-19T14:57:11.860Z",
+  "scanStartedAt": "2026-11-19T16:43:18.199Z",
+  "scanFinishedAt": "2026-11-19T16:43:26.450Z",
   "durationSeconds": 8,
   "resumed": 0,
   "registry": "https://registry.modelcontextprotocol.io",
   "coverage": {
     "mode": "updated_since",
-    "since": "2026-11-19T12:36:11.373Z",
+    "since": "2026-11-19T12:57:04.274Z",
     "lastFullPass": {
       "startedAt": "2026-11-19T14:36:11.373Z",
       "finishedAt": "2026-11-19T14:56:52.561Z",
@@ -28,11 +28,11 @@
     "command": "check-listing --fetch-tools"
   },
   "counts": {
-    "listingsScanned": 351,
-    "pages": 4,
+    "listingsScanned": 498,
+    "pages": 5,
     "rowsWithoutName": 0,
-    "withPublisherMetadata": 15,
-    "withPointer": 0,
+    "withPublisherMetadata": 16,
+    "pointersInListRead": 0,
     "checked": 1,
     "listed": 1,
     "withdrawn": 0,
@@ -51,8 +51,9 @@
       "registryStatus": "active",
       "registryUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/com.rtlpdf%2Farabic-pdf/versions/1.0.0",
       "pointerInList": true,
-      "checkedAt": "2026-11-19T14:57:08.419Z",
-      "durationMs": 3438,
+      "checkedAt": "2026-11-19T16:43:22.519Z",
+      "durationMs": 3929,
+      "attempts": 1,
       "state": "verified_newer_declaration",
       "exitCode": 11,
       "reasons": [],
@@ -74,6 +75,7 @@
         "state": "valid"
       },
       "declaration": {
+        "of": "in_force",
         "issuedAt": "2026-11-19T03:14:55Z",
         "expiresAt": "2027-05-18T03:14:55Z",
         "keyMethod": "http",
