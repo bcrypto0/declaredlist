@@ -9,3 +9,5 @@
 *.css text eol=lf
 LICENSE text eol=lf
 NOTICE text eol=lf
+# Font files are binary.
+*.woff2 binary

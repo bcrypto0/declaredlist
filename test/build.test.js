@@ -8,6 +8,10 @@ import { BANNED, DASHES, visibleText } from '../testlib/wording.js';
 
 after(removeTempDirs);
 
+// The text of markup as a reader or a copy gets it: tags removed (commands,
+// addresses and state codes are set in spans that only mark break points).
+const textOf = (html) => html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+
 function walk(dir) {
   const out = [];
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -41,7 +45,7 @@ test('a build from hostile data escapes everything and links only https', () => 
     assert.doesNotMatch(s, /@example\.org/, 'email removed from the description');
     for (const m of s.matchAll(/\shref="([^"]*)"/g)) {
       const h = m[1];
-      const ok = h === '#main' || /^https:\/\//.test(h) || /^(\.\.\/)?[A-Za-z0-9._\/-]+$/.test(h);
+      const ok = h === '#main' || /^#[a-z][a-z0-9-]*$/.test(h) || /^https:\/\//.test(h) || /^(\.\.\/)?[A-Za-z0-9._\/-]+$/.test(h);
       assert.ok(ok, `unexpected href ${h} in ${f}`);
       assert.doesNotMatch(h, /^(javascript|data|http):/i);
       assert.doesNotMatch(h, /^https:\/\/[^/]*@/, 'no credentials in links');
@@ -98,7 +102,7 @@ test('a build from a plain fixture has every page and follows the wording rules'
   assert.match(fs.readFileSync(path.join(dist, 'method.html'), 'utf8'), /Reporting a wrong result/);
   const page = fs.readFileSync(path.join(dist, 'listing', 'com.example__weather.html'), 'utf8');
   assert.match(page, /Declaration found and signature valid on 19 November 2026/);
-  assert.match(page, /check-listing com\.example\/weather --version 1\.0\.0 --fetch-tools/);
+  assert.match(textOf(page), /check-listing com\.example\/weather --version 1\.0\.0 --fetch-tools/);
   assert.match(page, /1 May 2027/, 'expiry shown');
   assert.match(page, /2026-07-28/, 'protocol version shown');
   assert.match(page, /href="https:\/\/example\.com\/\.well-known\/addon-declaration\/com\.example\/weather\/by-hash\/aa\.json" rel="noopener noreferrer nofollow"/, 'pointer linked');
@@ -171,7 +175,7 @@ test('a scan over updated listings says what it read and when the last full pass
   const { dist } = build(latest);
   const index = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
   assert.match(index, /Listings read in this scan/);
-  assert.match(index, /42 \(the latest version of each listing published or changed since 18 November 2026, 12:00 UTC\)/);
+  assert.match(textOf(index), /42 \(the latest version of each listing published or changed since 18 November 2026, 12:00 UTC\)/);
   assert.match(index, /Last full pass over the registry/);
   assert.match(index, /66,849 listings read/);
   const text = visibleText(index);
@@ -202,7 +206,9 @@ test('hidden characters, look-alike hosts and history files reach no page as wri
     JSON.stringify({ listings: [{ name: 'com.example/hist', version: 'old.contact@example.org', state: 'verified', checkedAt: '2026-11-01T00:00:00Z' }, { name: 'com.example/hist', version: 'C:\\Users\\someone\\leak', state: 'verified', checkedAt: '2026-11-02T00:00:00Z' }] }),
   );
   buildSite({ dataDir: data, outDir: dist });
-  for (const f of walk(dist)) {
+  // Every text file the build writes; the font files are binary (WOFF2) and
+  // copied unchanged from build/fonts.
+  for (const f of walk(dist).filter((x) => !x.endsWith('.woff2'))) {
     const t = fs.readFileSync(f, 'utf8');
     assert.doesNotMatch(t, /[\u{E0000}-\u{E007F}\u2028\u2029\u00AD\uFE0F\u3164]/u, `hidden character in ${f}`);
     assert.doesNotMatch(t, /@example\.org/, `email in ${f}`);
@@ -212,10 +218,11 @@ test('hidden characters, look-alike hosts and history files reach no page as wri
   }
   const page = fs.readFileSync(path.join(dist, 'listing', 'com.example__tagged.html'), 'utf8');
   assert.match(page, /\[U\+E0049\]/);
-  for (const m of page.matchAll(/<a href="(https:[^"]*)"[^>]*>([^<]*)</g)) {
-    if (m[2].startsWith('https://')) assert.equal(m[2], m[1], 'an address shown as text is the address linked');
+  for (const m of page.matchAll(/<a href="(https:[^"]*)"[^>]*>([\s\S]*?)<\/a>/g)) {
+    const shown = textOf(m[2]);
+    if (shown.startsWith('https://')) assert.equal(shown, m[1], 'an address shown as text is the address linked');
   }
-  assert.match(page, /xn--rlpdf-7ye\.com\/mcp/);
+  assert.match(textOf(page), /xn--rlpdf-7ye\.com\/mcp/);
   const hist = fs.readFileSync(path.join(dist, 'listing', 'com.example__hist.html'), 'utf8');
   assert.match(hist, /Earlier results/);
   assert.match(hist, /email address removed/);
@@ -259,17 +266,17 @@ test('the site text claims no more than the data shows', () => {
   const { dist } = build(plainLatest());
   const read = (f) => fs.readFileSync(path.join(dist, f), 'utf8');
   const index = read('index.html');
-  assert.match(index, /<h1>Registry listings that point to an add on declaration<\/h1>/);
+  assert.match(index, /<h1>Registry listings that point to an add&nbsp;on declaration<\/h1>/);
   assert.doesNotMatch(visibleText(index), /signed declaration/);
   assert.match(index, /optionally a price, a pay address and a contact/);
-  assert.match(index, /except the scanner states not_checkable and check_error/);
+  assert.match(textOf(index), /except the scanner states not_checkable and check_error/);
   assert.match(index, /most listing pages give the command/);
   const method = visibleText(read('method.html'));
   assert.doesNotMatch(method, /once a day|daily/i);
   assert.match(method, /newest one the publisher.s site served/);
   const pub = read('publishers.html');
   assert.doesNotMatch(visibleText(pub), /daily|picks the listing up/i);
-  assert.match(pub, /git clone https:\/\/github\.com\/bcrypto0\/addon-declaration/);
+  assert.match(textOf(pub), /git clone https:\/\/github\.com\/bcrypto0\/addon-declaration/);
   assert.match(pub, /--method http/);
   assert.match(pub, /mcp-publisher login http/);
   assert.match(pub, /once per page, in order/);
@@ -278,14 +285,14 @@ test('the site text claims no more than the data shows', () => {
   assert.match(pub, /not published in the registry yet/);
   assert.doesNotMatch(pub, /&lt;hash&gt;/, 'one placeholder for the hash');
   // Every command of the guide calls the checker by its path, not as bin/ in the publisher's folder.
-  const cmds = [...pub.matchAll(/<pre><code>([^<]*addon-declare\.js[^<]*)<\/code><\/pre>/g)].map((m) => m[1]);
+  const cmds = [...pub.matchAll(/<pre><code>([\s\S]*?)<\/code><\/pre>/g)].map((m) => textOf(m[1])).filter((c) => c.includes('addon-declare.js'));
   assert.equal(cmds.length, 6);
   assert.match(cmds[0], / prepare com\.example\/weather --for-version 1\.4\.1 --key-env MCP_PRIVATE_KEY$/);
   assert.match(pub, /<h2>The short way: one command<\/h2>/);
   assert.match(pub, /stops before signing if the private key is not the one you published/);
   for (const c of cmds) assert.match(c, /^node \.\.\/addon-declaration\/bin\/addon-declare\.js /, c);
   const page = read('listing/com.example__weather.html');
-  assert.match(page, /or the checker changed since 19 November 2026 \(this result used addon-declare 0\.2\.0\)/);
+  assert.match(textOf(page), /or the checker changed since 19 November 2026 \(this result used addon-declare 0\.2\.0\)/);
   for (const f of ['index.html', 'method.html', 'publishers.html', 'listing/com.example__weather.html']) {
     const text = visibleText(read(f));
     for (const w of BANNED) assert.doesNotMatch(text, w, `${f}: ${w}`);
@@ -305,7 +312,7 @@ test('the counts on the front page and in the feed agree with the list', () => {
   const index = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
   assert.match(index, /<dt>Of these, with a declaration pointer<\/dt><dd>0<\/dd>/);
   assert.match(index, /<dt>Listings shown below<\/dt><dd>1 \(/);
-  assert.equal((index.match(/<tr><td class="name"/g) || []).length, 1);
+  assert.equal((index.match(/<tr role="row"><td class="name"/g) || []).length, 1);
 });
 
 test('the build writes Pages headers that match the policy in the pages', () => {
@@ -325,8 +332,9 @@ test('the build writes Pages headers that match the policy in the pages', () => 
     assert.ok(meta, f);
     assert.equal(`${meta[1]}; frame-ancestors 'none'`, csp, f);
   }
-  // The policy allows what the pages use: one stylesheet from the site, nothing else.
-  assert.match(csp, /^default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'/);
+  // The policy allows what the pages use: one stylesheet and the font files
+  // from the site, nothing else.
+  assert.match(csp, /^default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; font-src 'self'; frame-ancestors 'none'$/);
   // Blocks of a path line and indented headers, separated by blank lines.
   const blocks = headers.trim().split('\n\n').map((b) => b.split('\n'));
   for (const b of blocks) {
@@ -346,7 +354,14 @@ test('pages wrap long publisher text, keep tables as tables and have a skip link
   const css = fs.readFileSync(path.join(dist, 'style.css'), 'utf8');
   assert.match(css, /main \{[^}]*overflow-wrap: break-word/);
   assert.match(css, /main p, main strong, \.lead, \.notice \{ overflow-wrap: anywhere; \}/);
-  assert.doesNotMatch(css, /table\.list[^{]*\{[^}]*display: block/, 'tables keep their table layout on phones');
+  // On phones the stylesheet stacks each table row into a block of lines; the
+  // table, its row groups, rows, header cells and cells then carry their
+  // roles in the markup, so screen readers still read a table.
+  assert.match(css, /table\.list[^{]*\{[^}]*display: block/);
+  const listing = fs.readFileSync(path.join(dist, 'listing', 'com.example__weather.html'), 'utf8');
+  for (const page of [fs.readFileSync(path.join(dist, 'index.html'), 'utf8'), listing]) {
+    for (const m of page.matchAll(/<(table|thead|tbody|tr|th|td)\b[^>]*>/g)) assert.match(m[0], / role="(table|rowgroup|row|columnheader|rowheader|cell)"/, m[0]);
+  }
   assert.match(css, /\.table-wrap \{ overflow-x: auto;/);
   const index = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
   assert.match(index, /<a class="skip" href="#main">Skip to content<\/a>/);

@@ -274,7 +274,7 @@ test('a published scan folds old snapshots, and a fold that fails does not undo 
   const page = fs.readFileSync(path.join(dist, 'listing', 'com.a__x.html'), 'utf8');
   assert.match(page, /<h2>Earlier results<\/h2>/);
   assert.match(page, /<h2>Older results, by month<\/h2>/);
-  assert.match(page, /<td data-label="First check">1 September 2026<\/td><td data-label="Last check">1 September 2026<\/td><td data-label="Checks">1<\/td>/);
+  assert.match(page, /<td data-label="First check" role="cell">1 September 2026<\/td><td data-label="Last check" role="cell">1 September 2026<\/td><td data-label="Checks" role="cell">1<\/td>/);
 
   // A digest that cannot be read does not fail the scan.
   const dir2 = tempDir();
@@ -307,7 +307,7 @@ test('month digests are cleaned like other data before they reach a page', () =>
   assert.match(page, /Older results, by month/);
   assert.doesNotMatch(page, /@example\.org/);
   assert.doesNotMatch(page, /<script>|<b>old|<i>9/);
-  assert.match(page, /<td data-label="Checks">1<\/td>/);
+  assert.match(page, /<td data-label="Checks" role="cell">1<\/td>/);
   assert.equal((page.match(/data-label="First check"/g) || []).length, 1);
 });
 

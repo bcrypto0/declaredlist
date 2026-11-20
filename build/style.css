@@ -1,86 +1,478 @@
-/* declaredlist.com: one hand written stylesheet, system fonts, light and dark. */
+/* declaredlist.com: one hand written stylesheet.
+   The public record: a register on ledger paper. Prose in Libre Caslon Text,
+   heads in Libre Caslon Display, every value a machine produced (hashes,
+   state codes, versions, commands, times) in DM Mono. All three are served
+   from this site (fonts/, see build/fonts/FONTS.md).
+   Two rule systems only: ink hairlines, and the one red margin line.
+   Red marks the structure of the record (the count, section numerals, the
+   joins of a chain, links, focus), never a result: no state is coloured. */
+
+@font-face {
+  font-family: "Libre Caslon Text";
+  src: url("fonts/LibreCaslonText-wght.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libre Caslon Text";
+  src: url("fonts/LibreCaslonText-Italic-wght.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libre Caslon Display";
+  src: url("fonts/LibreCaslonDisplay-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Mono";
+  src: url("fonts/DMMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --bg: #fcfcfa;
-  --fg: #1c1c1a;
-  --muted: #5a5a55;
-  --rule: #d9d9d3;
-  --panel: #f2f2ee;
-  --link: #174d86;
-  --link-visited: #4f3a7a;
-  --mark: #7a5a00;
-  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --paper: #f4efe3;   /* register paper */
+  --paper-2: #ebe4d3; /* the typed slip */
+  --ink: #1d1914;     /* iron gall ink: text and the structural hairlines */
+  --ink-2: #4a4237;   /* secondary text */
+  --ink-3: #665c4d;   /* labels and marginalia */
+  --hair: #cdc2ad;    /* ink hairline between rows */
+  --rubric: #a3241a;  /* the rubricator's red */
+  --margin: #c4483b;  /* the one red margin line */
+  --serif: "Libre Caslon Text", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --display: "Libre Caslon Display", "Libre Caslon Text", Georgia, serif;
+  --mono: "DM Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --mcol: 6.5rem;     /* the margin column, left of the red line */
+  --ncol: 16rem;      /* the note column */
+  --gap: 2.75rem;
+  --pad: 3rem;
+  --line: 1.75rem;    /* pitch of the blank register lines */
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #131312;
-    --fg: #e7e7e2;
-    --muted: #a5a59e;
-    --rule: #34342f;
-    --panel: #1d1d1b;
-    --link: #8fbaf0;
-    --link-visited: #c0a9ec;
-    --mark: #e0b54a;
+    --paper: #15130f;
+    --paper-2: #1e1b16;
+    --ink: #ece3cf;
+    --ink-2: #c9bea8;
+    --ink-3: #a99e88;
+    --hair: #4d4639;
+    --rubric: #ef8069;
+    --margin: #a4473a;
   }
 }
+
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font: 1rem/1.55 var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.125rem/1.58 var(--serif);
+  font-feature-settings: "kern", "liga";
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  text-rendering: optimizeLegibility;
 }
-.wrap { max-width: 52rem; margin: 0 auto; padding: 0 1rem; }
-header.site { border-bottom: 2px solid var(--fg); padding: 1rem 0 0.6rem; }
-header.site .wrap { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1.2rem; }
-.brand { font-weight: 700; font-size: 1.15rem; letter-spacing: 0.02em; color: var(--fg); text-decoration: none; }
-.brand small { font-weight: 400; color: var(--muted); font-size: 0.85rem; letter-spacing: 0; margin-left: 0.4rem; }
-nav.site { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font-size: 0.95rem; }
-nav.site a { color: var(--fg); }
-main { padding: 1.2rem 0 2rem; overflow-wrap: break-word; }
+main { display: block; overflow-wrap: break-word; }
 main p, main strong, .lead, .notice { overflow-wrap: anywhere; }
+
+a { color: inherit; text-decoration-line: underline; text-decoration-color: var(--rubric); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+a:visited { text-decoration-style: dotted; }
+:focus-visible { outline: 2px solid var(--rubric); outline-offset: 3px; }
 .skip { position: absolute; left: -10000px; top: 0; }
-.skip:focus { left: 1rem; top: 0.5rem; background: var(--bg); color: var(--link); padding: 0.3rem 0.6rem; border: 2px solid var(--fg); z-index: 1; }
-h1 { font-size: 1.55rem; line-height: 1.25; margin: 0.4rem 0 0.8rem; overflow-wrap: anywhere; }
-h2 { font-size: 1.15rem; margin: 2rem 0 0.6rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--rule); }
-h3 { font-size: 1rem; margin: 1.4rem 0 0.4rem; }
-p, ul, ol, dl, table, pre { margin: 0 0 1rem; }
-a { color: var(--link); text-underline-offset: 0.15em; }
-a:visited { color: var(--link-visited); }
-code, pre, .mono { font-family: var(--mono); font-size: 0.88em; }
-code { overflow-wrap: anywhere; }
-pre { background: var(--panel); border: 1px solid var(--rule); padding: 0.75rem; overflow-x: auto; white-space: pre; line-height: 1.45; }
-.lead { font-size: 1.05rem; }
-.muted, .note { color: var(--muted); }
-.notice { border: 1px solid var(--rule); border-left: 4px solid var(--mark); background: var(--panel); padding: 0.6rem 0.8rem; margin: 0 0 1.2rem; }
-.url { overflow-wrap: anywhere; font-family: var(--mono); font-size: 0.88em; }
-dl.facts { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr; gap: 0.35rem 1rem; }
-dl.facts dt { color: var(--muted); }
-dl.facts dd { margin: 0; overflow-wrap: anywhere; }
-.table-wrap { overflow-x: auto; border: 1px solid var(--rule); margin: 0 0 1rem; }
-table { border-collapse: collapse; width: 100%; font-size: 0.95rem; margin: 0; }
-th, td { text-align: left; vertical-align: top; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); }
-thead th { background: var(--panel); font-weight: 600; }
-tbody tr:last-child td { border-bottom: 0; }
-td.name { overflow-wrap: anywhere; min-width: 10rem; }
-.state { font-family: var(--mono); font-size: 0.85em; }
-ul.plain { padding-left: 1.2rem; }
-ul.plain li { margin: 0.15rem 0; overflow-wrap: anywhere; }
-ol.steps > li { margin: 0 0 0.8rem; }
-footer.site { border-top: 1px solid var(--rule); padding: 1rem 0 2rem; font-size: 0.9rem; color: var(--muted); }
-footer.site p { margin: 0 0 0.5rem; }
-@media (max-width: 34rem) {
-  h1 { font-size: 1.35rem; }
-  dl.facts { grid-template-columns: 1fr; gap: 0.1rem; }
-  dl.facts dd { margin-bottom: 0.6rem; }
-  /* Tables keep their table layout (and so their meaning for screen readers);
-     a wide one scrolls inside its frame, not the page. */
-  th, td { padding: 0.4rem 0.45rem; }
-  td.name { min-width: 8rem; }
+.skip:focus { left: 1rem; top: 0.5rem; z-index: 5; background: var(--paper); color: var(--ink); padding: 0.4rem 0.7rem; outline: 2px solid var(--rubric); }
+
+code, pre, .typed, .url, .state, .tm {
+  font-family: var(--mono);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "kern";
 }
+code { font-size: 0.84em; overflow-wrap: anywhere; }
+code.nw { white-space: nowrap; }
+.typed { font-size: 0.84em; overflow-wrap: anywhere; }
+/* addresses break only after a "/" or between the pieces the generator marks
+   (each .u stays whole), so no line starts with a hyphen */
+.url { font-size: 0.84em; overflow-wrap: normal; word-break: normal; }
+.url .u, code .u { white-space: nowrap; }
+code.addr { overflow-wrap: normal; }
+.url code, .typed code { font-size: 1em; }
+.tm { font-size: 0.84em; white-space: nowrap; }
+/* hashes: groups of eight, spaced by margins, so a copy has no added characters */
+code .pre { color: var(--ink-3); }
+code .g { white-space: nowrap; margin-right: 0.42em; }
+code .g:last-child { margin-right: 0; }
+/* four groups to a line, so every hash sets as four over four */
+code.hash { display: inline-block; max-width: 42.5ch; vertical-align: top; overflow-wrap: normal; }
+code .pre { margin-right: 0.12em; }
+
+.sc, dl.facts dt, .note .sc, thead th, .tally-cap, .crumbs {
+  font-family: var(--serif);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-variant-numeric: lining-nums;
+}
+
+/* ---------- the frame: margin column, red line, text, notes ---------- */
+.frame { max-width: 88rem; margin: 0 auto; padding: 0 var(--pad); }
+.row {
+  display: grid;
+  grid-template-columns: var(--mcol) minmax(0, 1fr) var(--ncol);
+  column-gap: var(--gap);
+}
+.m { grid-column: 1; min-width: 0; }
+.b { grid-column: 2; min-width: 0; }
+.b.wide { grid-column: 2 / 4; }
+.n { grid-column: 3; min-width: 0; }
+main > .frame { position: relative; padding-bottom: 4rem; }
+main > .frame::before {
+  /* the one red margin line, between the margin column and the text */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--pad) + var(--mcol) + var(--gap) / 2);
+  border-left: 1px solid var(--margin);
+  pointer-events: none;
+}
+
+/* ---------- masthead ---------- */
+header.site { border-bottom: 1px solid var(--ink); }
+header.site .frame { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 2rem; padding-top: 1.05rem; padding-bottom: 0.8rem; }
+.brand { font: 400 1.9rem/1 var(--display); letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+.brand small { font: 400 0.7rem/1 var(--serif); text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-3); margin-left: 0.65rem; vertical-align: 0.35em; }
+nav.site { display: flex; flex-wrap: wrap; gap: 0.2rem 1.7rem; font-size: 1.02rem; }
+nav.site a { text-decoration: none; padding: 0.15rem 0; border-bottom: 1px solid transparent; }
+nav.site a:hover { border-bottom-color: var(--rubric); }
+nav.site a[aria-current="page"] { color: var(--rubric); border-bottom-color: var(--rubric); }
+
+/* ---------- heads ---------- */
+h1, h2, h3 { font-weight: 400; overflow-wrap: anywhere; }
+h1, h2 { text-wrap: balance; }
+.lead, .recital, .pubtext p { text-wrap: pretty; }
+h1 { font: 400 clamp(2.1rem, 3.5vw, 3.15rem)/1.04 var(--display); letter-spacing: -0.012em; margin: 0 0 1.1rem; max-width: 17em; }
+.sec { padding-top: 3.8rem; }
+.secno { font: 400 1.7rem/1 var(--display); color: var(--rubric); text-align: right; margin: 0; padding-top: 0.28rem; font-variant-numeric: lining-nums; }
+.sec h2 { font: 400 clamp(1.75rem, 2.4vw, 2.2rem)/1.08 var(--display); margin: 0 0 1.3rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--ink); max-width: 100%; }
+h3 { font: italic 400 1.22rem/1.25 var(--serif); margin: 2rem 0 0.7rem; }
+p, ul, ol, dl, pre, blockquote { margin: 0 0 1rem; }
+.head { padding-top: 3.4rem; }
+.head .b > :last-child { margin-bottom: 0; }
+.sec .b > p, .sec .b > ul, .sec .b > ol { max-width: 40em; }
+.sec .b > ol.chain, .sec .b > ul.log { max-width: none; }
+.lead { font-size: 1.3rem; line-height: 1.45; max-width: 32em; }
+.muted { color: var(--ink-2); font-size: 0.95rem; }
+.endnote { padding-top: 2.5rem; margin: 0; }
+
+/* ---------- the count: the one hero of the list ---------- */
+.hero { padding-top: 3.6rem; align-items: start; }
+.hero-body { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 3rem; align-items: start; }
+.tally { margin: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.tally-num {
+  font: 400 clamp(10rem, 21vw, 19.5rem)/0.74 var(--display);
+  color: var(--rubric);
+  letter-spacing: -0.04em;
+  font-variant-numeric: lining-nums tabular-nums;
+  margin-left: -0.06em;
+}
+.tally-num.d2 { font-size: clamp(8rem, 15vw, 14rem); }
+.tally-num.d3 { font-size: clamp(6rem, 10vw, 9.5rem); }
+.tally-num.d4 { font-size: clamp(4.4rem, 7.5vw, 7rem); }
+.tally-cap { color: var(--ink-3); margin-top: 1.4rem; max-width: 9rem; line-height: 1.5; }
+.hero-text { padding-top: 0.5rem; }
+.hero-text p { max-width: 34em; }
+
+/* ---------- notes in the note column ---------- */
+.note { font-size: 0.9rem; line-height: 1.5; color: var(--ink-2); border-top: 1px solid var(--ink); padding-top: 0.6rem; margin: 0.35rem 0 1.4rem; }
+.note .sc { display: block; color: var(--rubric); margin-bottom: 0.3rem; }
+.note p { margin: 0; }
+.note .muted { font-size: inherit; }
+
+/* ---------- facts: a register stub, label and value on ruled lines ---------- */
+dl.facts { display: grid; grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr); margin: 0 0 1.2rem; border-top: 1px solid var(--ink); }
+dl.facts dt, dl.facts dd { margin: 0; padding: 0.62rem 0 0.6rem; border-bottom: 1px solid var(--hair); }
+dl.facts dt { color: var(--ink-3); padding-top: 0.84rem; padding-right: 1.4rem; line-height: 1.5; }
+dl.facts dd { line-height: 1.5; overflow-wrap: anywhere; min-width: 0; font-variant-numeric: lining-nums; }
+.sec h2 + dl.facts, .sec h2 + .notice + dl.facts { border-top: 0; }
+.sec h2 + .register thead th { border-top: 0; }
+.pair { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: 0.1rem 0.6rem; margin-top: 0.3rem; }
+.pair .dk { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-3); padding-top: 0.08rem; }
+.notice { margin: 0 0 1.4rem; padding: 0.8rem 0 0.85rem 1.1rem; border-left: 1px solid var(--ink); font-style: italic; color: var(--ink); max-width: 40em; }
+
+/* ---------- the register ---------- */
+table { border-collapse: collapse; width: 100%; margin: 0; }
+th, td { text-align: left; vertical-align: baseline; }
+.register thead th { color: var(--ink-3); font-weight: 400; padding: 0.55rem 1.4rem 0.5rem 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); position: relative; }
+.register thead th:last-child, .register td.when { padding-right: 0; }
+.register .no {
+  position: absolute;
+  right: calc(100% + var(--gap));
+  text-align: right;
+  white-space: nowrap;
+  color: var(--rubric);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.register thead .no { color: var(--ink-3); top: 0.55rem; }
+.register tr.day th { font: italic 400 1.08rem/1.3 var(--serif); color: var(--ink-2); padding: 1.6rem 0 0.45rem; border-bottom: 1px solid var(--ink); }
+.register thead + tbody tr.day th { padding-top: 1.1rem; }
+.register td { padding: 1.05rem 1.4rem 1.1rem 0; border-bottom: 1px solid var(--hair); }
+.register td.name { position: relative; width: 46%; }
+.register td.name .no { font: 400 2.05rem/1 var(--display); top: 0.95rem; }
+.register td.name a { font: 400 1.55rem/1.15 var(--display); text-decoration: none; overflow-wrap: anywhere; background-image: linear-gradient(var(--rubric), var(--rubric)), linear-gradient(var(--hair), var(--hair)); background-size: 0 1px, 100% 1px; background-repeat: no-repeat; background-position: 0 100%, 0 100%; padding-bottom: 0.08em; }
+.register td.name a:hover, .register td.name a:focus-visible { background-size: 100% 1px, 100% 1px; }
+.register td.name a .ns { color: var(--ink-3); }
+.e-title { display: block; font-style: italic; color: var(--ink-2); font-size: 1rem; margin-top: 0.3rem; }
+.e-ver { display: block; color: var(--ink-3); font-size: 0.86rem; margin-top: 0.15rem; }
+.e-ver code { color: var(--ink); }
+/* a state code breaks only after an underscore (a <wbr>), never inside a word */
+.state { display: block; font-size: 0.86rem; line-height: 1.4; overflow-wrap: normal; word-break: normal; }
+dd .state { display: inline; }
+.gloss { display: block; font-style: italic; color: var(--ink-2); font-size: 0.98rem; line-height: 1.35; margin-top: 0.2rem; }
+.register td.when { font-family: var(--mono); font-size: 0.86rem; white-space: nowrap; width: 7rem; font-variant-numeric: lining-nums tabular-nums; }
+/* blank ruled lines under the last entry: the register has room */
+.blank { height: calc(var(--line) * 4); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--line) - 1px), var(--hair) calc(var(--line) - 1px), var(--hair) var(--line)); margin-bottom: 1.4rem; }
+.register-sec .b > p.muted { max-width: 44em; margin-top: 1.1rem; }
+.register .tz-h { display: none; }
+.withdrawn li { color: var(--ink-2); }
+
+/* ---------- tables on listing pages ---------- */
+.table-wrap { overflow-x: auto; margin: 0 0 1rem; border-top: 1px solid var(--ink); }
+.sec h2 + .table-wrap { border-top: 0; }
+table.list:not(.register) thead th { color: var(--ink-3); font-weight: 400; padding: 0.55rem 1.2rem 0.5rem 0; border-bottom: 1px solid var(--ink); }
+table.list:not(.register) td { padding: 0.7rem 1.2rem 0.7rem 0; border-bottom: 1px solid var(--hair); }
+
+/* ---------- a listing page ---------- */
+.listing-head { padding-top: 1.6rem; align-items: start; }
+.crumbs { color: var(--ink-3); margin: 0 0 1.6rem; }
+.crumbs a { color: var(--ink-2); }
+.entry-name { font: 400 clamp(2.4rem, 5.6vw, 5.2rem)/0.98 var(--display); letter-spacing: -0.02em; margin: 0; max-width: none; }
+.entry-name .ns { color: var(--ink-3); }
+.entry-title { font-style: italic; font-size: 1.55rem; line-height: 1.3; margin: 0.9rem 0 0; }
+.pubtext { margin: 1.5rem 0 0; padding: 0 0 0 1.2rem; border-left: 1px solid var(--ink); max-width: 34em; }
+.pubtext p { margin: 0; font-size: 1.18rem; }
+.pubtext p::before { content: "\201C"; margin-left: -0.42em; }
+.pubtext p::after { content: "\201D"; }
+.pubtext footer { margin-top: 0.35rem; font-size: 0.86rem; color: var(--ink-3); }
+/* publisher text in a right to left script: upright (the Latin faces have no
+   Arabic or Hebrew, so an italic would be a slanted fallback), and the quotes
+   on the sides where that text opens and closes */
+:is(.entry-title, .e-title, .pubtext p):dir(rtl) { font-style: normal; }
+.pubtext p:dir(rtl)::before { content: "\201D"; margin-left: 0; margin-right: -0.42em; }
+.pubtext p:dir(rtl)::after { content: "\201C"; }
+.listing-head .n { padding-top: 3.2rem; }
+.typed-line { font-family: var(--mono); font-size: 0.86rem; color: var(--ink-2); margin: 0 0 0.9rem; font-variant-numeric: lining-nums tabular-nums; }
+.recital { font-size: clamp(1.45rem, 2.1vw, 1.9rem); line-height: 1.32; max-width: 25em; margin-bottom: 1rem; }
+.tools { max-width: 38em; }
+
+/* the chain of statements on one ink spine */
+.chain-sub { color: var(--ink-2); font-style: italic; margin-bottom: 1.8rem; }
+ol.chain { list-style: none; margin: 0 0 1rem; padding: 0; }
+.stmt { position: relative; padding-left: 3.6rem; }
+.stmt::before { content: ""; position: absolute; left: 1.1rem; top: 0; bottom: 0; border-left: 1px solid var(--ink); }
+.stmt:first-child::before { top: 1rem; }
+.stmt:last-child::before { bottom: auto; height: 1rem; }
+.stmt:only-child::before { display: none; }
+.stmt-no {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.2rem;
+  margin: 0;
+  padding: 0.1rem 0 0.25rem;
+  text-align: center;
+  background: var(--paper);
+  font: 400 1.75rem/1.1 var(--display);
+  font-variant-numeric: lining-nums;
+}
+.stmt h3 { font: 400 clamp(1.45rem, 2vw, 1.75rem)/1.12 var(--display); margin: 0 0 0.85rem; padding-top: 0.25rem; position: relative; }
+.stmt-note { font-style: italic; color: var(--ink-2); font-size: 0.98rem; line-height: 1.45; margin: -0.3rem 0 0.9rem; max-width: 36em; }
+.stmt dl.facts { grid-template-columns: minmax(8.5rem, 12.5rem) minmax(0, 1fr); margin-bottom: 0; }
+.join { position: relative; margin: 0; padding: 1.15rem 0 1.5rem; font: italic 400 1.28rem/1.3 var(--serif); color: var(--rubric); }
+.join::before { content: ""; position: absolute; left: -2.5rem; width: 1.8rem; top: calc(1.15rem + 0.68em); border-top: 1px solid var(--ink); }
+
+/* checked items as numbered clauses; the same for checked and not checked */
+ol.clauses { list-style: none; margin: 0 0 1.2rem; padding: 0; counter-reset: cl; border-top: 1px solid var(--ink); max-width: 46em; }
+ol.clauses li { counter-increment: cl; display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); padding: 0.45rem 0; border-bottom: 1px solid var(--hair); line-height: 1.45; overflow-wrap: anywhere; }
+ol.clauses li::before { content: "(" counter(cl, lower-roman) ")"; color: var(--rubric); font-style: italic; }
+/* unnumbered clauses: hanging lines between hairlines, no marker */
+ul.plain { list-style: none; margin: 0 0 1.2rem; padding: 0; border-top: 1px solid var(--ink); }
+ul.plain li { margin: 0; padding: 0.45rem 0 0.45rem 1.6rem; text-indent: -1.6rem; border-bottom: 1px solid var(--hair); line-height: 1.45; overflow-wrap: anywhere; }
+.sec h2 + ul.plain, .sec h2 + ol.clauses { border-top: 0; }
+
+/* the requests a check made: method, address, answer */
+ul.log { list-style: none; margin: 0 0 1rem; padding: 0; border-top: 1px solid var(--ink); font-family: var(--mono); font-size: 0.8rem; line-height: 1.45; font-variant-numeric: lining-nums tabular-nums; }
+ul.log li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) auto; column-gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--hair); }
+ul.log .url { font-size: 1em; }
+ul.log .lr { text-align: right; white-space: nowrap; color: var(--ink-2); }
+
+/* the command, typed on a slip */
+/* long commands wrap on screen; a copy keeps each one on its line */
+pre { font-family: var(--mono); font-size: 0.86rem; line-height: 1.65; background: var(--paper-2); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 0.9rem 1.1rem; overflow-x: auto; white-space: pre-wrap; overflow-wrap: normal; margin: 0 0 1rem; max-width: 100%; }
+pre code { font-size: 1em; overflow-wrap: normal; }
+/* one command to a line; a wrapped line hangs two characters in, and breaks
+   only between arguments (or after a "/" inside a long path) */
+pre .ln { display: block; padding-left: 2ch; text-indent: -2ch; }
+pre .arg { white-space: nowrap; }
+pre .u { white-space: nowrap; }
+/* a JSON line that wraps hangs four characters in from its own indent */
+pre .ln.j0 { padding-left: 4ch; text-indent: -4ch; }
+pre .ln.j2 { padding-left: 6ch; text-indent: -6ch; }
+pre .ln.j4 { padding-left: 8ch; text-indent: -8ch; }
+pre .ln.j6 { padding-left: 10ch; text-indent: -10ch; }
+pre .ln.j8 { padding-left: 12ch; text-indent: -12ch; }
+
+/* ---------- the rail: contents and particulars kept in the note column ---------- */
+.railed { position: relative; }
+.rail { position: absolute; top: 0; bottom: 0; right: 0; width: var(--ncol); padding-top: 3.8rem; }
+.rail-in { position: sticky; top: 1.6rem; }
+.rail-h { color: var(--rubric); margin: 0 0 0.45rem; }
+ol.contents { list-style: none; margin: 0 0 1.6rem; padding: 0; border-top: 1px solid var(--ink); font-size: 0.92rem; line-height: 1.35; }
+ol.contents li { border-bottom: 1px solid var(--hair); }
+ol.contents a { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); padding: 0.42rem 0 0.4rem; text-decoration: none; color: var(--ink-2); }
+ol.contents a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--rubric); }
+ol.contents .cn { font: 400 0.98rem/1.35 var(--display); color: var(--rubric); font-variant-numeric: lining-nums; }
+dl.stub-l { display: grid; grid-template-columns: 4.6rem minmax(0, 1fr); margin: 0 0 1.4rem; border-top: 1px solid var(--ink); font-size: 0.9rem; line-height: 1.4; }
+dl.stub-l dt, dl.stub-l dd { margin: 0; padding: 0.45rem 0 0.42rem; border-bottom: 1px solid var(--hair); }
+dl.stub-l dt { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); padding-top: 0.6rem; }
+dl.stub-l dd { min-width: 0; }
+dl.stub-l .state { font-size: 0.8rem; }
+dl.stub-l .tm { font-size: 0.8rem; }
+.stub + .rail-notes { margin-top: 0.4rem; }
+
+/* ---------- method and publishers ---------- */
+ol.steps { list-style: none; padding: 0; counter-reset: step -1; }
+.sec .b > ol.steps { max-width: 52em; }
+ol.steps > li { counter-increment: step; position: relative; padding: 0.9rem 0 0.4rem 3.2rem; border-top: 1px solid var(--hair); }
+ol.steps > li::before { content: counter(step); position: absolute; left: 0; top: 0.75rem; font: 400 1.8rem/1 var(--display); color: var(--rubric); font-variant-numeric: lining-nums; }
+ol.steps > li > p { max-width: 40em; }
+
+/* ---------- colophon ---------- */
+footer.site { border-top: 1px solid var(--ink); }
+footer.site .frame { padding-top: 2rem; padding-bottom: 3rem; }
+footer.site p { font-size: 0.92rem; line-height: 1.55; color: var(--ink-2); margin: 0 0 0.75rem; max-width: 46em; }
+footer.site .colophon-mark { font: 400 1.35rem/1 var(--display); color: var(--ink); text-align: right; margin: 0; padding-top: 0.15rem; }
+
+/* The italic carries a historical st ligature; the record keeps plain
+   letters. Set after every font shorthand, which resets ligatures. */
+.chain-sub, .stmt-note, .join, h3, .gloss, .e-title, .entry-title, .register tr.day th, .notice, .pubtext, ol.clauses li::before {
+  font-variant-ligatures: no-common-ligatures no-discretionary-ligatures no-historical-ligatures;
+  font-feature-settings: "kern", "liga" 0, "dlig" 0, "hlig" 0;
+}
+.when-t { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-2); margin-left: 0.5em; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+
+/* ---------- motion: only the link underline moves ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .register td.name a { transition: background-size 0.25s ease; }
+}
+
+/* ---------- medium widths: the note column folds under the text ---------- */
+@media (max-width: 72rem) {
+  :root { --ncol: 0px; --gap: 2rem; --pad: 2rem; --mcol: 4.5rem; }
+  .row { grid-template-columns: var(--mcol) minmax(0, 1fr); }
+  .n, .b.wide { grid-column: 2; }
+  .n { margin-top: 1.4rem; max-width: 30rem; }
+  .listing-head .n { padding-top: 0; }
+  .hero-body { column-gap: 2rem; }
+  /* the rail is set before the sections, in the text column */
+  .rail { position: static; width: auto; display: grid; grid-template-columns: var(--mcol) minmax(0, 1fr); column-gap: var(--gap); padding-top: 2.4rem; }
+  .rail-in { grid-column: 2; position: static; max-width: 30rem; }
+  .rail .stub { display: none; }
+  .rail-notes .note:last-child { margin-bottom: 0; }
+  ol.contents { margin-bottom: 0; }
+}
+
+/* ---------- phone ---------- */
+@media (max-width: 40rem) {
+  :root { --mcol: 1.9rem; --gap: 1.1rem; --pad: 1rem; --line: 1.5rem; }
+  body { font-size: 1.0625rem; }
+  header.site .frame { padding-top: 0.85rem; padding-bottom: 0.65rem; }
+  .brand { font-size: 1.6rem; }
+  .brand small { display: block; margin: 0.35rem 0 0; vertical-align: 0; }
+  nav.site { gap: 0.2rem 1.1rem; font-size: 0.98rem; }
+  .head, .hero { padding-top: 2.2rem; }
+  .sec { padding-top: 2.8rem; }
+  .secno { font-size: 1.15rem; padding-top: 0.35rem; }
+  .sec h2 { font-size: 1.6rem; }
+  h1 { font-size: 1.85rem; }
+  .hero-body { grid-template-columns: minmax(0, 1fr); }
+  .tally { flex-direction: row; align-items: flex-end; gap: 1rem; margin-bottom: 1.6rem; }
+  .tally-num { font-size: 7.5rem; }
+  .tally-num.d2 { font-size: 6.2rem; }
+  .tally-num.d3 { font-size: 4.6rem; }
+  .tally-num.d4 { font-size: 3.4rem; }
+  .tally-cap { margin: 0 0 0.3rem; }
+  .lead { font-size: 1.14rem; }
+  dl.facts, .stmt dl.facts { grid-template-columns: minmax(0, 1fr); }
+  dl.facts dt { border-bottom: 0; padding: 0.7rem 0 0; }
+  dl.facts dd { padding-top: 0.15rem; }
+  /* tables stack: each entry is a block of ruled lines, the column heads
+     become small labels over the values (the head row stays for screen
+     readers, out of sight) */
+  table.list, table.list tbody { display: block; width: 100%; }
+  table.list thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  table.list tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1.2rem; border-bottom: 1px solid var(--hair); }
+  table.list td, table.list:not(.register) td { display: block; padding: 0 0 0.85rem; border-bottom: 0; min-width: 0; }
+  table.list td[data-label]::before { content: attr(data-label); display: block; font: 400 0.66rem/1.4 var(--serif); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); margin-bottom: 0.2rem; font-variant-numeric: lining-nums; }
+  .register tr.day { display: block; border-bottom: 0; }
+  .register tr.day th { display: block; }
+  .register td.name { grid-column: 1 / -1; width: auto; padding: 0.9rem 0 0.7rem; }
+  table.list.register td.name::before { content: none; }
+  .register td.when { width: auto; text-align: right; font-size: 0.8rem; }
+  .register td.name .no { font-size: 1.3rem; top: 0.95rem; right: calc(100% + var(--gap)); }
+  .register td.name a { font-size: 1.3rem; }
+  /* listing pages: the first cell spans the entry; a wide cell has its own line */
+  table.list:not(.register) tr { grid-template-columns: minmax(0, max-content) minmax(0, 1fr); padding-top: 0.75rem; }
+  table.list:not(.register) td:first-child, table.list td.full { grid-column: 1 / -1; }
+  table.list.earlier td:first-child::before { content: none; }
+  table.list.older tr { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .when-t { margin-left: 0.6em; }
+  .state { font-size: 0.78rem; }
+  .gloss { font-size: 0.86rem; }
+  .e-title { font-size: 0.94rem; }
+  .entry-name { font-size: clamp(2rem, 10.4vw, 2.7rem); }
+  .entry-title { font-size: 1.25rem; }
+  .recital { font-size: 1.3rem; }
+  /* the chain: statement numbers in the margin column, as the section
+     numerals are; the ink spine starts 0.9rem inside the text column, with
+     a tick to each statement head and each join */
+  .stmt { padding-left: 1.9rem; }
+  .stmt::before { left: 0.9rem; }
+  .stmt:first-child::before { top: 1.05rem; }
+  .stmt:last-child::before { height: 1.05rem; }
+  .stmt-no { left: calc(-1 * (var(--gap) + var(--mcol))); width: var(--mcol); padding: 0.35rem 0 0; text-align: right; background: none; font-size: 1.15rem; color: var(--ink); }
+  .stmt h3::before { content: ""; position: absolute; left: -1rem; width: 0.7rem; top: 1.05rem; border-top: 1px solid var(--ink); }
+  .join { font-size: 1.12rem; }
+  .join::before { left: -1rem; width: 0.7rem; }
+  .pair { grid-template-columns: 4.6rem minmax(0, 1fr); }
+  ul.log li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 0.15rem; }
+  ul.log .la { grid-column: 1 / -1; grid-row: 2; }
+  ol.clauses li { grid-template-columns: 2.6rem minmax(0, 1fr); }
+  ol.steps > li { padding-left: 2.2rem; }
+  ol.steps > li::before { font-size: 1.4rem; }
+  pre { font-size: 0.78rem; padding: 0.8rem 0.75rem; }
+  footer.site .colophon-mark { display: none; }
+}
+
+/* ---------- print: the record on paper ---------- */
 @media print {
-  header.site nav, footer.site { display: none; }
-  a { color: inherit; }
+  :root { --paper: #fff; --paper-2: #fff; --ink: #000; --ink-2: #222; --ink-3: #444; --hair: #999; --rubric: #000; --margin: #999; }
+  body { font-size: 10.5pt; }
+  header.site nav, .skip, footer.site .colophon-mark { display: none; }
+  a { color: inherit; text-decoration: none; }
+  .tally-num { font-size: 72pt; }
+  .sec { padding-top: 1.6rem; }
+  .register tr, dl.facts dt, dl.facts dd, ol.clauses li, ul.log li, .stmt h3 { break-inside: avoid; }
+  pre, pre.slip { white-space: pre-wrap; background: none; }
+  footer.site { break-inside: avoid; }
+  /* on paper the contents and particulars add nothing; the notes stay */
+  .rail { position: static; width: auto; padding-top: 1rem; }
+  .rail-in { position: static; }
+  .rail nav, .rail .stub { display: none; }
 }
