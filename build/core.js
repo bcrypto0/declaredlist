@@ -40,6 +40,13 @@ https://:version.:project.pages.dev/*
 `;
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const MAX_HISTORY_FILES = 400;
+// Month digests of older scans (scan/history.js) and the runs shown per listing.
+const MAX_MONTH_FILES = 120;
+const MAX_MONTH_RUNS = 60;
+// Daily results shown per listing: more than the days the scanner keeps as
+// snapshots (HISTORY_KEEP_DAYS in scan/history.js), so no day falls between
+// the daily table and the month digests.
+const MAX_EARLIER_ROWS = 200;
 const README_URL = `${CHECKER_SOURCE}#readme`;
 const SPEC_URL = `${CHECKER_SOURCE}/blob/main/SPEC.md`;
 const DEFAULT_REGISTRY = 'https://registry.modelcontextprotocol.io';
@@ -149,7 +156,7 @@ function digestLine(label, d) {
   return fact(label, parts.join(', '));
 }
 
-function listingPage(r, file, hist, scan) {
+function listingPage(r, file, hist, scan, older = []) {
   const name = s(r.name);
   const title = `${clip(name, 120)} | Declared`;
   const sentence = stateSentence(r);
@@ -205,6 +212,16 @@ ${esc(cmd)}</code></pre>
 <thead><tr><th scope="col">Scan date</th><th scope="col">Version</th><th scope="col">State</th></tr></thead>
 <tbody>
 ${hist.map((h) => `<tr><td data-label="Scan date">${esc(formatDate(h.checkedAt))}</td><td data-label="Version">${code(h.version, 60)}</td><td data-label="State">${stateCell(h)}</td></tr>`).join('\n')}
+</tbody></table></div>`;
+  }
+  if (older.length) {
+    body += `
+<h2>Older results, by month</h2>
+<p class="muted">Scans older than about six weeks are kept as one row per run: scans of one month that follow one another, each of which showed this listing with the same version, state and declaration.</p>
+<div class="table-wrap"><table class="list">
+<thead><tr><th scope="col">First check</th><th scope="col">Last check</th><th scope="col">Checks</th><th scope="col">Version</th><th scope="col">Declaration</th><th scope="col">State</th></tr></thead>
+<tbody>
+${older.map((h) => `<tr><td data-label="First check">${esc(formatDate(h.firstCheckedAt))}</td><td data-label="Last check">${esc(formatDate(h.lastCheckedAt))}</td><td data-label="Checks">${esc(h.checks)}</td><td data-label="Version">${code(h.version, 60)}</td><td data-label="Declaration">${h.declaration ? code(h.declaration, 80) : ''}</td><td data-label="State">${stateCell(h)}</td></tr>`).join('\n')}
 </tbody></table></div>`;
   }
   body += `\n<p class="muted">From the scan finished ${esc(formatDateTime(scan.scanFinishedAt))}.</p>`;
@@ -449,7 +466,42 @@ function readHistory(dataDir) {
       if (!r || typeof r.name !== 'string') continue;
       if (!by.has(r.name)) by.set(r.name, []);
       const list = by.get(r.name);
-      if (list.length < 60 && !list.some((x) => x.checkedAt === r.checkedAt)) list.push({ checkedAt: r.checkedAt, version: r.version, state: r.state });
+      if (list.length <= MAX_EARLIER_ROWS && !list.some((x) => x.checkedAt === r.checkedAt)) list.push({ checkedAt: r.checkedAt, version: r.version, state: r.state });
+    }
+  }
+  return by;
+}
+
+// Runs of results from the month digests in data/history (written by
+// scan/history.js from snapshots older than about six weeks), for each name,
+// newest first.
+function readMonthRuns(dataDir) {
+  const dir = path.join(dataDir, 'history');
+  let files = [];
+  try {
+    files = fs.readdirSync(dir).filter((f) => /^\d{4}-\d{2}\.json$/.test(f)).sort().reverse().slice(0, MAX_MONTH_FILES);
+  } catch {
+    return new Map();
+  }
+  const by = new Map();
+  const isTime = (v) => typeof v === 'string' && Number.isFinite(Date.parse(v));
+  for (const f of files) {
+    let m;
+    try {
+      m = sanitizeData(JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
+    } catch {
+      continue;
+    }
+    if (!m || !Array.isArray(m.listings)) continue;
+    for (const l of m.listings) {
+      if (!l || typeof l.name !== 'string' || !Array.isArray(l.runs)) continue;
+      if (!by.has(l.name)) by.set(l.name, []);
+      const list = by.get(l.name);
+      for (const run of [...l.runs].reverse()) {
+        if (list.length >= MAX_MONTH_RUNS) break;
+        if (!run || !isTime(run.firstCheckedAt) || !isTime(run.lastCheckedAt)) continue;
+        list.push({ firstCheckedAt: run.firstCheckedAt, lastCheckedAt: run.lastCheckedAt, checks: Number.isInteger(run.checks) && run.checks > 0 ? run.checks : 1, version: run.version, declaration: typeof run.declaration === 'string' ? run.declaration : null, state: run.state });
+      }
     }
   }
   return by;
@@ -493,6 +545,7 @@ export function buildSite({ dataDir, outDir, rename = fs.renameSync }) {
   const files = assignFileBases(latest.listings.map((r) => r.name));
   for (const b of files.values()) if (!isSafeFileBase(b)) throw new Error('an unsafe file name was produced; nothing was built');
   const history = readHistory(dataDir);
+  const monthRuns = readMonthRuns(dataDir);
 
   const tmp = `${outDir}.tmp-${process.pid}`;
   fs.rmSync(tmp, { recursive: true, force: true });
@@ -511,8 +564,8 @@ export function buildSite({ dataDir, outDir, rename = fs.renameSync }) {
   write('404.html', notFoundPage());
   for (const r of latest.listings) {
     const file = files.get(r.name);
-    const hist = (history.get(r.name) || []).filter((h) => h.checkedAt !== r.checkedAt).slice(0, 30);
-    write(path.join('listing', `${file}.html`), listingPage(r, file, hist, latest));
+    const hist = (history.get(r.name) || []).filter((h) => h.checkedAt !== r.checkedAt).slice(0, MAX_EARLIER_ROWS);
+    write(path.join('listing', `${file}.html`), listingPage(r, file, hist, latest, monthRuns.get(r.name) || []));
   }
   write('data.json', JSON.stringify(feed(latest, files, status), null, 2) + '\n');
   write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);

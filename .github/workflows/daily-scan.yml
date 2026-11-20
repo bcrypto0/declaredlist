@@ -7,12 +7,22 @@
 # node build/build.js, output folder dist); no deploy token or other secret is
 # stored in this repository.
 #
-# Every run changes data/status.json (the time and outcome of the attempt), so
-# every run makes a commit, and the schedule stays active. A scan that fails or
+# Nearly every run changes data/status.json (the time and outcome of the attempt)
+# and so makes a commit, and the schedule stays active. A scan that fails or
 # stops leaves data/latest.json as it was (the scanner fails closed) and
 # records the reason in data/status.json; the site then shows the last complete
-# scan with a notice. Failed tests, and data the site build refuses, are
-# recorded the same way.
+# scan with a notice. A failed setup step (the checkout of the checker, the
+# Node setup, the restore of saved progress), failed tests, and data the site
+# build refuses are recorded the same way. Only a failed checkout of this
+# repository itself, or a step that fails before it can write
+# data/status.json, leaves no record in data/; the failed run in the Actions
+# tab is the record of that.
+#
+# The commit subject is read from data/status.json (scan/commit-message.js),
+# so it says "success" only when a scan was published.
+#
+# The actions are pinned to full commit SHAs of releases whose action.yml
+# declares the node24 runtime (checked 20 November 2026).
 #
 # data/ on main is written by this job only. A hand edit to data/ pushed while
 # a run is going makes that run's push fail (its rebase stops on the conflict);
@@ -56,14 +66,20 @@ jobs:
       # registry, publishers' domains and remote servers, and only the commit
       # step below needs to push.
       - name: Check out the site
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        id: site
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           path: site
           persist-credentials: false
 
+      # An outcome in data/status.json from before this time is not this run's.
+      - name: Note the start of the run
+        run: echo "RUN_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
       - name: Check out the public checker
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        id: checker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ env.CHECKER_REPOSITORY }}
           ref: ${{ env.CHECKER_SHA }}
@@ -71,8 +87,10 @@ jobs:
           persist-credentials: false
 
       - name: Set up Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        id: node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
+          package-manager-cache: false
           node-version: '22'
 
       # Progress of a scan that stopped (data/.scan/) is kept in the Actions
@@ -81,7 +99,8 @@ jobs:
       # The key names the attempt too, so a rerun of a run saves its own entry
       # and the next run restores the newest one.
       - name: Restore scan progress
-        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        id: restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: site/data/.scan
           key: scan-progress-${{ github.run_id }}-${{ github.run_attempt }}
@@ -98,6 +117,28 @@ jobs:
       - name: Record failed tests
         if: always() && steps.test.outcome == 'failure'
         run: node scan/record-failure.js --phase tests --reason 'the tests of the scanner and the site failed; no scan was run'
+
+      # A setup step that failed (the tests were then skipped) is recorded too.
+      # failure() is false for a cancelled run, which records nothing. If the
+      # Node setup failed, the Node the runner image ships is used; without
+      # any Node this step fails and the failed run is the only record.
+      - name: Record a failed setup step
+        id: setup
+        if: failure() && steps.site.outcome == 'success' && steps.test.outcome == 'skipped'
+        env:
+          CHECKER_OUTCOME: ${{ steps.checker.outcome }}
+          NODE_OUTCOME: ${{ steps.node.outcome }}
+          RESTORE_OUTCOME: ${{ steps.restore.outcome }}
+        run: |
+          what='a setup step'
+          if [ "$CHECKER_OUTCOME" = failure ]; then
+            what='the checkout of the public checker'
+          elif [ "$NODE_OUTCOME" = failure ]; then
+            what='the Node setup'
+          elif [ "$RESTORE_OUTCOME" = failure ]; then
+            what='the restore of saved scan progress'
+          fi
+          node scan/record-failure.js --phase setup --reason "$what failed before the tests; no scan was run"
 
       # scan/next-pass.js chooses the pass: a full pass that stopped and can
       # still be continued comes first; a full pass also runs on Sundays (UTC)
@@ -130,7 +171,7 @@ jobs:
       - name: Upload scan progress to the cache
         if: always() && steps.test.outcome == 'success'
         continue-on-error: true
-        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: site/data/.scan
           key: scan-progress-${{ github.run_id }}-${{ github.run_attempt }}
@@ -155,11 +196,11 @@ jobs:
 
       # data/latest.json, data/status.json and data/history/ are the record of
       # what was found. data/.scan/ is ignored by .gitignore. The token is given
-      # to git for this step only.
+      # to git for this step only. The subject comes from data/status.json, which
+      # by now holds the outcome of this run, including a refused build.
       - name: Commit data
-        if: always() && (steps.test.outcome == 'success' || steps.test.outcome == 'failure')
+        if: always() && (steps.test.outcome == 'success' || steps.test.outcome == 'failure' || steps.setup.outcome == 'success')
         env:
-          SCAN_OUTCOME: ${{ steps.test.outcome == 'success' && steps.scan.outcome || 'tests failed' }}
           GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name 'github-actions[bot]'
@@ -170,7 +211,11 @@ jobs:
             echo "data/ did not change"
             exit 0
           fi
-          git commit -q -m "Scan $(date -u +%Y-%m-%dT%H:%MZ): $SCAN_OUTCOME"
+          subject="$(node scan/commit-message.js --since "$RUN_START" 2>/dev/null)" || subject=''
+          if [ -z "$subject" ]; then
+            subject="Scan $(date -u +%Y-%m-%dT%H:%MZ): outcome not read"
+          fi
+          git commit -q -m "$subject"
           for attempt in 1 2 3; do
             if git -c http.https://github.com/.extraheader="$auth" push origin HEAD:main; then
               exit 0

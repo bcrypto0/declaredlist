@@ -9,7 +9,9 @@
 // * data/latest.json is replaced only by a scan that finished and passed its
 //   sanity checks. A failed scan leaves it as it was and records the failure in
 //   data/status.json. An empty list is not published in place of a full one.
-// * data/history/<date>.json files are created once and not changed.
+// * data/history/<date>.json files are created once and not changed. After a
+//   scan is published, those older than HISTORY_KEEP_DAYS are folded into one
+//   digest per month and removed from the folder (scan/history.js).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,6 +21,7 @@ import { isoDay, scrubPaths, clip } from '../lib/text.js';
 import { rowFacts } from './check.js';
 import { ScanStop } from './registry.js';
 import { latestProblem } from '../lib/validate.js';
+import { compactHistory, HISTORY_KEEP_DAYS } from './history.js';
 
 export const SCHEMA = 'declaredlist/scan-1';
 const HOUR = 3600 * 1000;
@@ -236,6 +239,27 @@ export function recordFailure(dataDir, { reason, phase = 'start', kind = 'error'
   return updateStatus(p, { lastAttempt: { at: when, ok: false }, lastFailure: { at: when, phase, reason: clip(scrubPaths(reason), 400), kind } });
 }
 
+// The subject line of the daily data commit, from what the run recorded in
+// data/status.json. It says "success" only for a published scan. A status
+// whose last attempt is older than maxAgeMs, or older than the start of the
+// run when that is given (since), was not written by this run.
+export function commitSubject(status, { now = new Date(), maxAgeMs = 6 * HOUR, since = null } = {}) {
+  const stamp = `${now.toISOString().slice(0, 16)}Z`;
+  const a = status && typeof status === 'object' && status.lastAttempt && typeof status.lastAttempt === 'object' ? status.lastAttempt : null;
+  const at = a ? Date.parse(a.at) : NaN;
+  const from = since === null ? NaN : Date.parse(since);
+  if (!a || !Number.isFinite(at) || now.getTime() - at > maxAgeMs || at - now.getTime() > HOUR || (Number.isFinite(from) && at < from)) return `Scan ${stamp}: outcome not recorded`;
+  if (a.ok === true) return `Scan ${stamp}: success`;
+  const f = status.lastFailure && typeof status.lastFailure === 'object' && status.lastFailure.at === a.at ? status.lastFailure : {};
+  if (f.phase === 'setup') return `Scan ${stamp}: no scan, a setup step failed`;
+  if (f.phase === 'tests') return `Scan ${stamp}: no scan, the tests failed`;
+  if (f.phase === 'build') return `Scan ${stamp}: not published, the site build refused the data`;
+  if (f.kind === 'rejected') return `Scan ${stamp}: not published, the result was rejected`;
+  if (f.kind === 'stopped') return `Scan ${stamp}: stopped`;
+  if (f.kind === 'busy') return `Scan ${stamp}: no scan, the scan lock was held or could not be read`;
+  return `Scan ${stamp}: failed`;
+}
+
 // options:
 //   dataDir
 //   deps: { listPage(cursor) -> { servers, nextCursor }, checkOne(entry) -> record,
@@ -248,8 +272,10 @@ export function recordFailure(dataDir, { reason, phase = 'start', kind = 'error'
 //   maxPassAgeMs (since the start of the saved scan); minFraction (of the last
 //   full pass a new full pass must reach); maxPages; maxRunMs (time budget of this run);
 //   lockRefreshMs (how often the lock is refreshed while progress is saved)
+//   historyKeepDays (snapshots in data/history older than this are folded
+//   into month digests after a scan is published)
 // Returns { ok, latest?, reason?, resumable? }.
-export async function runScan({ dataDir, deps, registryBase, checkerVersion = null, since = null, fresh = false, maxResumeAgeMs = RESUME_WINDOW_MS, maxPassAgeMs = MAX_PASS_AGE_MS, minFraction = 0.5, maxPages = 2000, maxRunMs = 60 * 60 * 1000, lockRefreshMs = LOCK_REFRESH_MS }) {
+export async function runScan({ dataDir, deps, registryBase, checkerVersion = null, since = null, fresh = false, maxResumeAgeMs = RESUME_WINDOW_MS, maxPassAgeMs = MAX_PASS_AGE_MS, minFraction = 0.5, maxPages = 2000, maxRunMs = 60 * 60 * 1000, lockRefreshMs = LOCK_REFRESH_MS, historyKeepDays = HISTORY_KEEP_DAYS }) {
   const p = paths(dataDir);
   const log = deps.log || (() => {});
   const now = deps.now || (() => new Date());
@@ -486,6 +512,13 @@ export async function runScan({ dataDir, deps, registryBase, checkerVersion = nu
     // Published: the saved progress is not used again.
     fs.rmSync(p.state, { force: true });
     updateStatus(p, { lastAttempt: { at: latest.scanFinishedAt, ok: true }, lastSuccess: { at: latest.scanFinishedAt, history: path.basename(histFile) } });
+    // Old snapshots are folded into month digests. A failure here changes
+    // nothing that was published and is only logged.
+    try {
+      compactHistory(p.history, { now: finished, keepDays: historyKeepDays, log });
+    } catch (e) {
+      log(`history: old snapshots were not folded (${clip(scrubPaths(e && e.message ? e.message : 'unknown error'), 200)})`);
+    }
     log(`done: ${latest.counts.listingsScanned} listings scanned, ${latest.counts.pointersInListRead} with a pointer in the list, ${records.length} checked, ${listings.length} listed`);
     return { ok: true, latest };
   } catch (e) {
