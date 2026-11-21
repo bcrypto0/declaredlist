@@ -27,7 +27,7 @@ function build(latest, extra) {
   const data = path.join(root, 'data');
   const dist = path.join(root, 'dist');
   writeData(data, latest, extra);
-  buildSite({ dataDir: data, outDir: dist });
+  buildSite({ dataDir: data, outDir: dist, census: false });
   return { root, data, dist, files: walk(dist) };
 }
 
@@ -122,9 +122,9 @@ test('a build without data fails and leaves the previous dist in place', () => {
   const { data, dist } = build(plainLatest());
   const before = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
   fs.writeFileSync(path.join(data, 'latest.json'), JSON.stringify({ scanFinishedAt: '2026-11-19T00:00:00Z', listings: [], counts: { listingsScanned: 0 } }));
-  assert.throws(() => buildSite({ dataDir: data, outDir: dist }), /no scanned listings/);
+  assert.throws(() => buildSite({ dataDir: data, outDir: dist, census: false }), /no scanned listings/);
   fs.rmSync(path.join(data, 'latest.json'));
-  assert.throws(() => buildSite({ dataDir: data, outDir: dist }), /missing/);
+  assert.throws(() => buildSite({ dataDir: data, outDir: dist, census: false }), /missing/);
   assert.equal(fs.readFileSync(path.join(dist, 'index.html'), 'utf8'), before);
 });
 
@@ -205,7 +205,7 @@ test('hidden characters, look-alike hosts and history files reach no page as wri
     path.join(data, 'history', '2026-11-01.json'),
     JSON.stringify({ listings: [{ name: 'com.example/hist', version: 'old.contact@example.org', state: 'verified', checkedAt: '2026-11-01T00:00:00Z' }, { name: 'com.example/hist', version: 'C:\\Users\\someone\\leak', state: 'verified', checkedAt: '2026-11-02T00:00:00Z' }] }),
   );
-  buildSite({ dataDir: data, outDir: dist });
+  buildSite({ dataDir: data, outDir: dist, census: false });
   // Every text file the build writes; the font files are binary (WOFF2) and
   // copied unchanged from build/fonts.
   for (const f of walk(dist).filter((x) => !x.endsWith('.woff2'))) {
@@ -251,13 +251,13 @@ test('a build that cannot put the new site in place leaves the previous one', ()
   const latest = plainLatest();
   latest.scanFinishedAt = '2026-11-21T00:00:00.000Z';
   writeData(data, latest);
-  assert.throws(() => buildSite({ dataDir: data, outDir: dist, rename: fail }), /locked/);
+  assert.throws(() => buildSite({ dataDir: data, outDir: dist, rename: fail, census: false }), /locked/);
   assert.equal(fs.readFileSync(path.join(dist, 'index.html'), 'utf8'), before, 'previous site in place');
   const parent = path.dirname(dist);
   assert.deepEqual(fs.readdirSync(parent).filter((f) => f.includes('tmp-old')), [], 'nothing left aside');
   fs.rmSync(path.join(parent, `dist.tmp-${process.pid}`), { recursive: true, force: true });
   // A normal build replaces it and leaves no folder aside either.
-  buildSite({ dataDir: data, outDir: dist });
+  buildSite({ dataDir: data, outDir: dist, census: false });
   assert.match(fs.readFileSync(path.join(dist, 'index.html'), 'utf8'), /21 November 2026/);
   assert.deepEqual(fs.readdirSync(parent).filter((f) => f.includes('.tmp-')), []);
 });

@@ -17,7 +17,7 @@ function build(latest) {
   const data = path.join(root, 'data');
   const dist = path.join(root, 'dist');
   writeData(data, latest);
-  buildSite({ dataDir: data, outDir: dist });
+  buildSite({ dataDir: data, outDir: dist, census: false });
   return { dist, read: (f) => fs.readFileSync(path.join(dist, f), 'utf8') };
 }
 
@@ -214,7 +214,7 @@ test('earlier results are listed newest first by time, whatever the history file
   fs.writeFileSync(path.join(data, 'history', '2026-11-19.json'), snap('2026-11-19T16:43:00.000Z', '1.0.2'));
   fs.writeFileSync(path.join(data, 'history', '2026-11-19T145711Z.json'), snap('2026-11-19T14:57:11.000Z', '1.0.1'));
   fs.writeFileSync(path.join(data, 'history', '2026-11-20.json'), snap('2026-11-20T11:57:00.000Z', '1.0.3'));
-  buildSite({ dataDir: data, outDir: dist });
+  buildSite({ dataDir: data, outDir: dist, census: false });
   const page = fs.readFileSync(path.join(dist, 'listing', 'com.example__weather.html'), 'utf8');
   const versions = [...page.split('<h2>Earlier results</h2>')[1].matchAll(/<td data-label="Version" role="cell"><code[^>]*>([^<]*)<\/code>/g)].map((m) => m[1]);
   assert.deepEqual(versions, ['1.0.3', '1.0.2', '1.0.1']);

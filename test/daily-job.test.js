@@ -270,7 +270,7 @@ test('a published scan folds old snapshots, and a fold that fails does not undo 
 
   // The listing page shows the folded run under the daily results.
   const dist = path.join(dir, 'dist');
-  buildSite({ dataDir: dir, outDir: dist });
+  buildSite({ dataDir: dir, outDir: dist, census: false });
   const page = fs.readFileSync(path.join(dist, 'listing', 'com.a__x.html'), 'utf8');
   assert.match(page, /<h2>Earlier results<\/h2>/);
   assert.match(page, /<h2>Older results, by month<\/h2>/);
@@ -302,7 +302,7 @@ test('month digests are cleaned like other data before they reach a page', () =>
   });
   writeSnap(path.join(dir, 'history'), '2026-07.json', '{ damaged');
   const dist = path.join(dir, 'dist');
-  buildSite({ dataDir: dir, outDir: dist });
+  buildSite({ dataDir: dir, outDir: dist, census: false });
   const page = fs.readFileSync(path.join(dist, 'listing', 'com.a__x.html'), 'utf8');
   assert.match(page, /Older results, by month/);
   assert.doesNotMatch(page, /@example\.org/);

@@ -44,7 +44,7 @@ test('a pass over updated listings that reads none is published and the site bui
   assert.equal(r.latest.coverage.mode, 'updated_since');
   assert.equal(r.latest.listings.length, 1);
   const dist = path.join(root, 'dist');
-  buildSite({ dataDir: data, outDir: dist });
+  buildSite({ dataDir: data, outDir: dist, census: false });
   const index = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
   assert.match(index, /<dt>Listings read in this scan<\/dt><dd>0 \(/);
   assert.match(index, /Last full pass over the registry/);

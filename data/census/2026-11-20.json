@@ -1,0 +1,418 @@
+{
+  "schema": "declaredlist/census-1",
+  "title": "Registry census, 20 November 2026",
+  "registry": "https://registry.modelcontextprotocol.io",
+  "readStartedAt": "2026-11-20T02:08:17.035Z",
+  "readFinishedAt": "2026-11-20T02:28:32.627Z",
+  "madeOn": "2026-11-21",
+  "registryCounts": {
+    "date": "2026-11-20",
+    "latestListings": 68030,
+    "active": 66937,
+    "deprecated": 1093,
+    "namespacesWithActiveListings": 41659,
+    "domainNamespaces": 23725,
+    "githubNamespaces": 17934
+  },
+  "words": {
+    "date": "2026-11-20",
+    "wordsCounted": 74,
+    "listings": 1204,
+    "sharePercentOfActive": 1.8,
+    "namespaces": 630,
+    "domain": {
+      "listings": 408,
+      "namespaces": 195
+    },
+    "github": {
+      "listings": 796,
+      "namespaces": 435
+    },
+    "perWordTotal": 1228,
+    "table": {
+      "wordsInTable": 96,
+      "setAside": 17,
+      "setAsideAsOpenNetworks": [
+        "ethereum",
+        "solana"
+      ],
+      "leftOutAfterHandCheck": [
+        "confluence",
+        "intercom",
+        "snowflake"
+      ],
+      "checkedOn": "2026-11-18",
+      "checkedAgainstCompanyPages": 28,
+      "notChecked": 46
+    },
+    "handCheck": {
+      "on": "2026-11-21",
+      "drawn": 10,
+      "frameMatches": 1306,
+      "frameWords": 79,
+      "ruleErrors": 0,
+      "readingErrors": 0,
+      "readInFullWords": 14,
+      "readInFullNames": 166,
+      "readInFullOtherMeaning": 10,
+      "readInFullKeptWords": 9,
+      "readInFullKeptNames": 100,
+      "readInFullKeptCounted": 99,
+      "readInFullKeptAlsoDrawn": 1
+    },
+    "minNamespacesForARow": 3,
+    "perWord": [
+      {
+        "word": "adobe",
+        "listings": 13,
+        "namespaces": 7
+      },
+      {
+        "word": "airbnb",
+        "listings": 14,
+        "namespaces": 10
+      },
+      {
+        "word": "airtable",
+        "listings": 8,
+        "namespaces": 8
+      },
+      {
+        "word": "anthropic",
+        "listings": 7,
+        "namespaces": 5
+      },
+      {
+        "word": "asana",
+        "listings": 5,
+        "namespaces": 5
+      },
+      {
+        "word": "atlassian",
+        "listings": 13,
+        "namespaces": 7
+      },
+      {
+        "word": "aws",
+        "listings": 15,
+        "namespaces": 13
+      },
+      {
+        "word": "azure",
+        "listings": 11,
+        "namespaces": 10
+      },
+      {
+        "word": "binance",
+        "listings": 5,
+        "namespaces": 5
+      },
+      {
+        "word": "bitbucket",
+        "listings": 10,
+        "namespaces": 10
+      },
+      {
+        "word": "clickup",
+        "listings": 9,
+        "namespaces": 9
+      },
+      {
+        "word": "cloudflare",
+        "listings": 15,
+        "namespaces": 14
+      },
+      {
+        "word": "coinbase",
+        "listings": 5,
+        "namespaces": 4
+      },
+      {
+        "word": "datadog",
+        "listings": 3,
+        "namespaces": 3
+      },
+      {
+        "word": "discord",
+        "listings": 25,
+        "namespaces": 23
+      },
+      {
+        "word": "dropbox",
+        "listings": 3,
+        "namespaces": 3
+      },
+      {
+        "word": "ebay",
+        "listings": 10,
+        "namespaces": 10
+      },
+      {
+        "word": "elevenlabs",
+        "listings": 5,
+        "namespaces": 4
+      },
+      {
+        "word": "facebook",
+        "listings": 19,
+        "namespaces": 13
+      },
+      {
+        "word": "figma",
+        "listings": 27,
+        "namespaces": 25
+      },
+      {
+        "word": "garmin",
+        "listings": 21,
+        "namespaces": 21
+      },
+      {
+        "word": "github",
+        "listings": 62,
+        "namespaces": 53
+      },
+      {
+        "word": "gitlab",
+        "listings": 17,
+        "namespaces": 16
+      },
+      {
+        "word": "gmail",
+        "listings": 23,
+        "namespaces": 22
+      },
+      {
+        "word": "hubspot",
+        "listings": 11,
+        "namespaces": 11
+      },
+      {
+        "word": "huggingface",
+        "listings": 6,
+        "namespaces": 3
+      },
+      {
+        "word": "instagram",
+        "listings": 55,
+        "namespaces": 43
+      },
+      {
+        "word": "jira",
+        "listings": 22,
+        "namespaces": 22
+      },
+      {
+        "word": "linkedin",
+        "listings": 78,
+        "namespaces": 57
+      },
+      {
+        "word": "mailchimp",
+        "listings": 6,
+        "namespaces": 6
+      },
+      {
+        "word": "metamask",
+        "listings": 0,
+        "namespaces": 0
+      },
+      {
+        "word": "microsoft",
+        "listings": 28,
+        "namespaces": 20
+      },
+      {
+        "word": "netlify",
+        "listings": 0,
+        "namespaces": 0
+      },
+      {
+        "word": "openai",
+        "listings": 27,
+        "namespaces": 15
+      },
+      {
+        "word": "outlook",
+        "listings": 22,
+        "namespaces": 17
+      },
+      {
+        "word": "paypal",
+        "listings": 4,
+        "namespaces": 4
+      },
+      {
+        "word": "perplexity",
+        "listings": 8,
+        "namespaces": 8
+      },
+      {
+        "word": "quickbooks",
+        "listings": 19,
+        "namespaces": 19
+      },
+      {
+        "word": "reddit",
+        "listings": 53,
+        "namespaces": 40
+      },
+      {
+        "word": "salesforce",
+        "listings": 17,
+        "namespaces": 14
+      },
+      {
+        "word": "sendgrid",
+        "listings": 6,
+        "namespaces": 6
+      },
+      {
+        "word": "sentry",
+        "listings": 5,
+        "namespaces": 5
+      },
+      {
+        "word": "sharepoint",
+        "listings": 4,
+        "namespaces": 4
+      },
+      {
+        "word": "shopify",
+        "listings": 54,
+        "namespaces": 51
+      },
+      {
+        "word": "slack",
+        "listings": 21,
+        "namespaces": 20
+      },
+      {
+        "word": "spotify",
+        "listings": 16,
+        "namespaces": 16
+      },
+      {
+        "word": "strava",
+        "listings": 7,
+        "namespaces": 7
+      },
+      {
+        "word": "stripe",
+        "listings": 13,
+        "namespaces": 12
+      },
+      {
+        "word": "supabase",
+        "listings": 7,
+        "namespaces": 6
+      },
+      {
+        "word": "telegram",
+        "listings": 48,
+        "namespaces": 45
+      },
+      {
+        "word": "tiktok",
+        "listings": 58,
+        "namespaces": 46
+      },
+      {
+        "word": "trello",
+        "listings": 7,
+        "namespaces": 7
+      },
+      {
+        "word": "twilio",
+        "listings": 3,
+        "namespaces": 3
+      },
+      {
+        "word": "twitter",
+        "listings": 18,
+        "namespaces": 15
+      },
+      {
+        "word": "uniswap",
+        "listings": 3,
+        "namespaces": 3
+      },
+      {
+        "word": "vercel",
+        "listings": 7,
+        "namespaces": 7
+      },
+      {
+        "word": "whatsapp",
+        "listings": 55,
+        "namespaces": 53
+      },
+      {
+        "word": "wix",
+        "listings": 0,
+        "namespaces": 0
+      },
+      {
+        "word": "wordpress",
+        "listings": 23,
+        "namespaces": 23
+      },
+      {
+        "word": "xero",
+        "listings": 11,
+        "namespaces": 11
+      },
+      {
+        "word": "youtube",
+        "listings": 129,
+        "namespaces": 99
+      },
+      {
+        "word": "zendesk",
+        "listings": 8,
+        "namespaces": 8
+      }
+    ],
+    "fewerNamespaces": {
+      "words": 12,
+      "listings": 24,
+      "namespaces": 16
+    }
+  },
+  "sharedAddresses": {
+    "date": "2026-11-20",
+    "addresses": 131,
+    "listings": 281,
+    "connectedByListingFields": 74,
+    "otherAddresses": 57,
+    "handCheck": {
+      "on": "2026-11-21",
+      "drawn": 6,
+      "ruleErrors": 0
+    }
+  },
+  "sharedDescriptions": {
+    "date": "2026-11-18",
+    "minCharacters": 40,
+    "groups": 512,
+    "listings": 1224,
+    "connectedByListingFields": 170,
+    "handCheck": {
+      "on": "2026-11-21",
+      "drawn": 4,
+      "ruleErrors": 0
+    }
+  },
+  "keptRecord": [
+    {
+      "file": "rows_20nov.json",
+      "date": "2026-11-20",
+      "sha256": "44d4b2eb435328814c3741fafda3ca94899d6c8164f6ce4658863ed432bedc67"
+    },
+    {
+      "file": "rows_18nov.json",
+      "date": "2026-11-18",
+      "sha256": "3edd98d7702d6c96d1c041c799c490be72b2db62ebd175bdb2070f3a7f16d5b0"
+    }
+  ]
+}

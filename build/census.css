@@ -1,0 +1,41 @@
+/* declaredlist.com: the census page only, after style.css.
+   Written into the site only when the census section is built, so a build
+   without it is the site as it was. Same rules as style.css: ink hairlines,
+   the red margin line and the red row numbers, no colour for any count. */
+
+.census-head .tally-cap { max-width: 11rem; }
+.census-head h1 .d, .census-head .tally-num { white-space: nowrap; }
+.recital.census-recital { font-size: clamp(1.25rem, 1.75vw, 1.55rem); line-height: 1.38; max-width: 31em; }
+
+/* the table of words: a register of one reading, row numbers in the margin */
+.words-wrap { max-width: 34rem; margin: 0 0 1.4rem; }
+table.words thead th { color: var(--ink-3); font-weight: 400; padding: 0.55rem 0 0.5rem; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); position: relative; }
+table.words tr.day th { font: italic 400 1.02rem/1.3 var(--serif); color: var(--ink-2); padding: 1rem 0 0.45rem; border-bottom: 1px solid var(--ink); }
+table.words td { padding: 0.38rem 0 0.36rem; border-bottom: 1px solid var(--hair); line-height: 1.5; }
+table.words td.w { position: relative; }
+table.words td.w code { font-size: 0.95rem; white-space: nowrap; }
+table.words th.num, table.words td.num { text-align: right; padding-left: 1.6rem; width: 8rem; font-variant-numeric: lining-nums tabular-nums; }
+table.words .no { position: absolute; right: calc(100% + var(--gap)); top: 0.36rem; text-align: right; white-space: nowrap; color: var(--rubric); font: 400 1.08rem/1.5 var(--display); font-variant-numeric: lining-nums tabular-nums; }
+table.words thead .no { color: var(--ink-3); top: 0.55rem; font: inherit; }
+table.words tr.fold td.w { font: italic 400 1rem/1.45 var(--serif); color: var(--ink-2); padding-right: 1rem; }
+table.words tfoot th, table.words tfoot td { padding: 0.7rem 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); font-weight: 400; text-align: left; font-style: italic; color: var(--ink-2); }
+table.words tfoot td.num { text-align: right; font-style: normal; color: var(--ink); }
+table.words tr.day th, table.words tfoot th {
+  font-variant-ligatures: no-common-ligatures no-discretionary-ligatures no-historical-ligatures;
+  font-feature-settings: "kern", "liga" 0, "dlig" 0, "hlig" 0;
+}
+
+/* the address for requests stays whole */
+.census-mail { white-space: nowrap; }
+
+/* phone: the table stays a table, three short columns fit */
+@media (max-width: 40rem) {
+  table.words th.num, table.words td.num { width: auto; padding-left: 0.9rem; }
+  table.words .no { font-size: 0.95rem; }
+  table.words td.w code { font-size: 0.86rem; }
+  .recital.census-recital { font-size: 1.2rem; }
+}
+
+@media print {
+  table.words tr { break-inside: avoid; }
+}

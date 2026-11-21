@@ -14,6 +14,7 @@ import { assignFileBases, isSafeFileBase } from '../lib/names.js';
 import { readJsonIfExists } from '../lib/fsutil.js';
 import { CHECKER_SOURCE, CHECKER_ISSUES } from '../lib/checker.js';
 import { latestProblem } from '../lib/validate.js';
+import { CENSUS_CONFIG_FILE, censusSwitchOn, checkCensusConfig, readCensusConfig, loadCensus, censusPage, censusPublic } from './census.js';
 
 export const SITE_URL = 'https://declaredlist.com';
 // The public repository of this site (code, data and tests) and its issues page.
@@ -82,7 +83,12 @@ const FOOTER = (root) => `<footer class="site"><div class="frame row">
 </div>
 </div></footer>`;
 
-function layout({ title, description, body, root = '', canonical, absolute = false, current = null }) {
+// Whether the build in progress includes the census section (set by
+// buildSite for the length of one build; the build is synchronous). With it
+// off, every page is the page the site had before the census existed.
+let WITH_CENSUS = false;
+
+function layout({ title, description, body, root = '', canonical, absolute = false, current = null, styles = [] }) {
   const base = absolute ? '/' : root;
   // The front page as the folder it is served from (Pages redirects /index.html to /).
   const home = base || './';
@@ -90,6 +96,7 @@ function layout({ title, description, body, root = '', canonical, absolute = fal
     [null, 'List', 'list'],
     ['method.html', 'Method', 'method'],
     ['publishers.html', 'Publishers', 'publishers'],
+    ...(WITH_CENSUS ? [['census.html', 'Census', 'census']] : []),
     ['data.json', 'Data', 'data'],
   ]
     .map(([href, text, key]) => `<a href="${esc(href === null ? home : base + href)}"${key === current ? ' aria-current="page"' : ''}>${esc(text)}</a>`)
@@ -106,7 +113,8 @@ function layout({ title, description, body, root = '', canonical, absolute = fal
 <meta name="description" content="${esc(description)}">
 ${canonical ? `<link rel="canonical" href="${esc(pageUrl(canonical))}">` : ''}
 <link rel="stylesheet" href="${esc(base + 'style.css')}">
-<link rel="icon" href="${esc(base + 'favicon.svg')}" type="image/svg+xml">
+${styles.map((x) => `<link rel="stylesheet" href="${esc(base + x)}">
+`).join('')}<link rel="icon" href="${esc(base + 'favicon.svg')}" type="image/svg+xml">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -971,9 +979,33 @@ export function validateLatest(latest) {
 // failed build leaves the previous dist/ as it was. The previous dist/ is
 // moved aside first and removed only after the new one is in place; if that
 // move fails, the previous one is put back. rename is replaceable in tests.
-export function buildSite({ dataDir, outDir, rename = fs.renameSync }) {
+export function buildSite({ dataDir, outDir, rename = fs.renameSync, census, censusConfigFile = CENSUS_CONFIG_FILE }) {
   const latest = sanitizeData(readJsonIfExists(path.join(dataDir, 'latest.json')));
   validateLatest(latest);
+  const cen = censusFor(census, dataDir, censusConfigFile);
+  WITH_CENSUS = Boolean(cen);
+  try {
+    return writeSite({ dataDir, outDir, rename, latest, cen });
+  } finally {
+    WITH_CENSUS = false;
+  }
+}
+
+// Whether this build includes the census, and its data. census: undefined
+// reads build/census.config.json, and only "publish": true turns it on; a
+// missing or unreadable config file is the switch off, so the daily build never
+// depends on it. true or false overrides "publish" (a preview build); an
+// object is a whole config (tests). With the census off nothing under
+// data/census is read and the config is not checked.
+function censusFor(census, dataDir, configFile) {
+  if (census === false) return null;
+  if (census === undefined && !censusSwitchOn(configFile)) return null;
+  const cfg = census && typeof census === 'object' ? checkCensusConfig(census) : readCensusConfig(configFile);
+  if (typeof census === 'object' && cfg.publish !== true) return null;
+  return { cfg, ...loadCensus(dataDir, cfg) };
+}
+
+function writeSite({ dataDir, outDir, rename, latest, cen }) {
   let status = null;
   try {
     status = sanitizeData(readJsonIfExists(path.join(dataDir, 'status.json')));
@@ -1013,9 +1045,15 @@ export function buildSite({ dataDir, outDir, rename = fs.renameSync }) {
     write(path.join('listing', `${file}.html`), listingPage(r, file, hist, latest, monthRuns.get(r.name) || []));
   }
   write('data.json', JSON.stringify(feed(latest, files, status), null, 2) + '\n');
+  if (cen) {
+    const helpers = { layout, section, railed, contentsList, fact, hashHtml, issuesUrl: SITE_ISSUES, authorsListing: [...AUTHORS_LISTINGS][0] };
+    write('census.css', fs.readFileSync(path.join(HERE, 'census.css')));
+    write('census.html', censusPage(cen.snap, cen.corrections, cen.cfg, helpers));
+    write('census.json', JSON.stringify(censusPublic(cen.snap, cen.corrections, pageUrl('census')), null, 2) + '\n');
+  }
   write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
   const day = isoDay(latest.scanFinishedAt);
-  const urls = ['index', 'method', 'publishers', ...latest.listings.map((r) => `listing/${files.get(r.name)}`)];
+  const urls = ['index', 'method', 'publishers', ...(cen ? ['census'] : []), ...latest.listings.map((r) => `listing/${files.get(r.name)}`)];
   write(
     'sitemap.xml',
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${esc(pageUrl(u))}</loc><lastmod>${day}</lastmod></url>`).join('\n')}\n</urlset>\n`,
@@ -1037,5 +1075,5 @@ export function buildSite({ dataDir, outDir, rename = fs.renameSync }) {
     throw e;
   }
   if (hadOld) fs.rmSync(old, { recursive: true, force: true });
-  return { pages: latest.listings.length + 5, files };
+  return { pages: latest.listings.length + 5 + (cen ? 1 : 0), files, census: Boolean(cen) };
 }

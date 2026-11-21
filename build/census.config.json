@@ -1,0 +1,9 @@
+{
+  "_note": "The census section of the site. publish false: the build writes the site exactly as without a census (no page, no navigation entry, no sitemap entry, no data file). The repository is public and the bot pushes to main every day, so the census files (this config, build/census.js, build/census.css, data/census and test/census.test.js) stay uncommitted, or on a local branch that is never pushed, until the owner has seen the pages and said yes: a commit with publish false still puts the page wording and the counts in public git history. Before publish may be true, the corrections address below must forward to the owner (declaredlist.com had no MX record on 21 Nov 2026) and one test message sent from outside must have arrived; record that day as \"correctionsAddressTested\": \"YYYY-MM-DD\". The build refuses publish true without it. The snapshot is read from data/ and must have the sha256 given here, so it cannot change unnoticed.",
+  "publish": true,
+  "snapshot": "census/2026-11-20.json",
+  "sha256": "0536e5812e945d0eaa38d6cc4d7937f29868d74df590addeb2e67c1e59354bf4",
+  "corrections": "census/corrections.json",
+  "correctionsEmail": "census@declaredlist.com",
+  "correctionsAddressTested": "2026-11-21"
+}
