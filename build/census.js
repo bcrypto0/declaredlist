@@ -206,6 +206,9 @@ export function censusPage(snap, corrections, cfg, h) {
   const HW = W.handCheck;
   const A = snap.sharedAddresses;
   const D = snap.sharedDescriptions;
+  // The host rewrites e-mail addresses into a script-decoded form by default;
+  // this site runs no script, so the address is fenced with the host's own
+  // opt-out comments and stays plain text.
   const mail = esc(cfg.correctionsEmail);
   const timeSpan = (iso) => `<time class="tm" datetime="${esc(new Date(Date.parse(iso)).toISOString())}">${esc(hhmm(iso))}</time>`;
   const dated = (d) => `<p class="typed-line">Registry read on <time datetime="${esc(d)}">${esc(day(d))}</time></p>`;
@@ -341,7 +344,7 @@ ${snap.keptRecord.map((k) => fact(`Rows of ${day(k.date)}`, `<code class="nw">${
   const requests = add(
     'corrections',
     'Corrections and requests',
-    `<p>To correct a figure, or to have a namespace left out of any data we keep or release, write to <a class="census-mail" href="mailto:${mail}">${mail}</a> with the listing name. Requests are read by a person, and corrections appear on this page with their date.</p>
+    `<p>To correct a figure, or to have a namespace left out of any data we keep or release, write to <!--email_off--><a class="census-mail" href="mailto:${mail}">${mail}</a><!--/email_off--> with the listing name. Requests are read by a person, and corrections appear on this page with their date.</p>
 <p>Counts for a past date stay as read; a namespace left out is removed from the kept rows, and a dated note says that one namespace was left out.</p>
 <p>A request can also be made on the public ${httpsLink(issuesUrl, 'issues page of the site repository')}. To ask for a namespace to be left out without asking in public, use the address above.</p>
 <p>This applies to the census. The register of declarations on the <a href="./">front page</a> lists what the registry serves and does not take listings in or out by request.</p>
