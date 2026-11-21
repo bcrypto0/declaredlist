@@ -382,7 +382,7 @@ test('the census page keeps the security policy: no script, no outside request, 
   const meta = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]*)">/);
   assert.equal(meta[1], CSP);
   // The host turns a bare address into a script-decoded link; fenced, it stays text.
-  assert.match(html, /<!--email_off--><a class="census-mail" href="mailto:census@declaredlist.com">census@declaredlist.com</a><!--/email_off-->/);
+  assert.ok(html.includes('<!--email_off--><a class="census-mail" href="mailto:census@declaredlist.com">census@declaredlist.com</a><!--/email_off-->'), 'the corrections address is fenced');
   assert.match(read('_headers'), /Content-Security-Policy: default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; font-src 'self'; frame-ancestors 'none'/);
   for (const [f, bytes] of files) {
     if (!f.endsWith('.html')) continue;
