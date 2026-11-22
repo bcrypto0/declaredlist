@@ -1,22 +1,22 @@
 {
   "schema": "declaredlist/scan-1",
-  "scanStartedAt": "2026-11-21T14:35:15.016Z",
-  "scanFinishedAt": "2026-11-21T14:35:39.934Z",
-  "durationSeconds": 25,
+  "scanStartedAt": "2026-11-22T14:29:56.087Z",
+  "scanFinishedAt": "2026-11-22T14:41:39.039Z",
+  "durationSeconds": 703,
   "resumed": 0,
   "registry": "https://registry.modelcontextprotocol.io",
   "coverage": {
-    "mode": "updated_since",
-    "since": "2026-11-20T13:22:17.033Z",
+    "mode": "full",
+    "since": null,
     "lastFullPass": {
-      "startedAt": "2026-11-19T14:36:11.373Z",
-      "finishedAt": "2026-11-19T14:56:52.561Z",
-      "listingsScanned": 67587,
-      "withPublisherMetadata": 2703
+      "startedAt": "2026-11-22T14:29:56.087Z",
+      "finishedAt": "2026-11-22T14:41:39.039Z",
+      "listingsScanned": 70115,
+      "withPublisherMetadata": 2728
     }
   },
   "method": {
-    "list": "https://registry.modelcontextprotocol.io/v0/servers?version=latest&limit=100&updated_since=<time> (cursor paging)",
+    "list": "https://registry.modelcontextprotocol.io/v0/servers?version=latest&limit=100 (cursor paging)",
     "listing": "https://registry.modelcontextprotocol.io/v0.1/servers/<name>/versions/<version> (read by the checker for each listing with a pointer)",
     "maxRegistryRequestsPerSecond": 1,
     "listIncludesPublisherMetadata": true
@@ -28,11 +28,11 @@
     "command": "check-listing --fetch-tools"
   },
   "counts": {
-    "listingsScanned": 2304,
-    "pages": 24,
+    "listingsScanned": 70115,
+    "pages": 702,
     "rowsWithoutName": 0,
-    "withPublisherMetadata": 65,
-    "pointersInListRead": 0,
+    "withPublisherMetadata": 2728,
+    "pointersInListRead": 1,
     "checked": 1,
     "listed": 1,
     "withdrawn": 0,
@@ -51,8 +51,8 @@
       "registryStatus": "active",
       "registryUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/com.rtlpdf%2Farabic-pdf/versions/1.0.1",
       "pointerInList": true,
-      "checkedAt": "2026-11-21T14:35:38.064Z",
-      "durationMs": 1869,
+      "checkedAt": "2026-11-22T14:41:37.146Z",
+      "durationMs": 1892,
       "attempts": 1,
       "state": "verified",
       "exitCode": 0,
