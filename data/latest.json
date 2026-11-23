@@ -1,13 +1,13 @@
 {
   "schema": "declaredlist/scan-1",
-  "scanStartedAt": "2026-11-22T14:29:56.087Z",
-  "scanFinishedAt": "2026-11-22T14:41:39.039Z",
-  "durationSeconds": 703,
+  "scanStartedAt": "2026-11-23T17:58:11.163Z",
+  "scanFinishedAt": "2026-11-23T17:58:43.588Z",
+  "durationSeconds": 32,
   "resumed": 0,
   "registry": "https://registry.modelcontextprotocol.io",
   "coverage": {
-    "mode": "full",
-    "since": null,
+    "mode": "updated_since",
+    "since": "2026-11-22T12:29:56.087Z",
     "lastFullPass": {
       "startedAt": "2026-11-22T14:29:56.087Z",
       "finishedAt": "2026-11-22T14:41:39.039Z",
@@ -16,7 +16,7 @@
     }
   },
   "method": {
-    "list": "https://registry.modelcontextprotocol.io/v0/servers?version=latest&limit=100 (cursor paging)",
+    "list": "https://registry.modelcontextprotocol.io/v0/servers?version=latest&limit=100&updated_since=<time> (cursor paging)",
     "listing": "https://registry.modelcontextprotocol.io/v0.1/servers/<name>/versions/<version> (read by the checker for each listing with a pointer)",
     "maxRegistryRequestsPerSecond": 1,
     "listIncludesPublisherMetadata": true
@@ -28,11 +28,11 @@
     "command": "check-listing --fetch-tools"
   },
   "counts": {
-    "listingsScanned": 70115,
-    "pages": 702,
+    "listingsScanned": 3089,
+    "pages": 31,
     "rowsWithoutName": 0,
-    "withPublisherMetadata": 2728,
-    "pointersInListRead": 1,
+    "withPublisherMetadata": 80,
+    "pointersInListRead": 0,
     "checked": 1,
     "listed": 1,
     "withdrawn": 0,
@@ -51,8 +51,8 @@
       "registryStatus": "active",
       "registryUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/com.rtlpdf%2Farabic-pdf/versions/1.0.1",
       "pointerInList": true,
-      "checkedAt": "2026-11-22T14:41:37.146Z",
-      "durationMs": 1892,
+      "checkedAt": "2026-11-23T17:58:41.222Z",
+      "durationMs": 2365,
       "attempts": 1,
       "state": "verified",
       "exitCode": 0,
