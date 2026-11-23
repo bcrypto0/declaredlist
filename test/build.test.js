@@ -50,7 +50,12 @@ test('a build from hostile data escapes everything and links only https', () => 
       assert.doesNotMatch(h, /^(javascript|data|http):/i);
       assert.doesNotMatch(h, /^https:\/\/[^/]*@/, 'no credentials in links');
     }
-    for (const m of s.matchAll(/<a [^>]*href="https:[^>]*>/g)) assert.match(m[0], /rel="noopener noreferrer nofollow"/);
+    // Every https link carries the site's rel, except the one fixed maker
+    // mark in the footer, which keeps the rel of the mark kit.
+    for (const m of s.matchAll(/<a [^>]*href="https:[^>]*>/g)) {
+      if (m[0] === '<a href="https://marsadel.com/mark/" rel="noopener" aria-label="Certified by Marsadel">') continue;
+      assert.match(m[0], /rel="noopener noreferrer nofollow"/);
+    }
     assert.doesNotMatch(s, /<link rel="stylesheet" href="https?:/, 'no external stylesheet');
     assert.match(s, /<link rel="stylesheet" href="(\.\.\/|\/)?style\.css">/);
     assert.doesNotMatch(s, /<(script|img|iframe|object|embed|form)\b/i);

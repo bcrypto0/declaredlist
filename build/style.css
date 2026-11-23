@@ -357,6 +357,9 @@ ol.steps > li > p { max-width: 40em; }
 footer.site { border-top: 1px solid var(--ink); }
 footer.site .frame { padding-top: 2rem; padding-bottom: 3rem; }
 footer.site p { font-size: 0.92rem; line-height: 1.55; color: var(--ink-2); margin: 0 0 0.75rem; max-width: 46em; }
+footer.site .maker { margin: 1.25rem 0 0; line-height: 0; }
+footer.site .maker a { color: inherit; display: inline-block; padding: 4px 0; }
+footer.site .maker svg { display: block; }
 footer.site .colophon-mark { font: 400 1.35rem/1 var(--display); color: var(--ink); text-align: right; margin: 0; padding-top: 0.15rem; }
 
 /* The italic carries a historical st ligature; the record keeps plain

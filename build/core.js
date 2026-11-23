@@ -74,12 +74,24 @@ const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'
 // links, the sitemap and the feed name pages that way.
 export const pageUrl = (rel) => `${SITE_URL}/${rel === 'index' ? '' : rel}`;
 
+// The maker's mark of the site itself: the plain "Certified by Marsadel" mark
+// from the Marsadel mark kit (snippet-plain), as the last row of the footer.
+// It is about who made this site, not about any listing or publisher. Inline
+// SVG drawn in currentColor: no script, no font, no outside request. The
+// kit's inline style attribute is left out, since the style policy of the
+// pages would drop it; build/style.css gives the colour instead.
+const MAKER_MARK = `<a href="https://marsadel.com/mark/" rel="noopener" aria-label="Certified by Marsadel"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 588 60" height="20" fill="currentColor" aria-hidden="true" focusable="false">
+  <path data-msd-punch="s" fill-rule="evenodd" d="M9 0H42L49.5 12L57 0H90L99 9V51L90 60H9L0 51V9ZM12 45V15H18L27 30L36 15H42V45H36V27L28.5 39.5H25.5L18 27V45ZM48 15H51V45H48ZM57 39H69V33Q69 27 75 27H84Q90 27 90 33V42Q90 45 87 45H57ZM75 39V33H84V39Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="6" stroke-miterlimit="4" d="M132 18H120Q114 18 114 24V36Q114 42 120 42H132M156 18H141V42H156M141 30H153M165 45V18H174Q180 18 180 24Q180 30 174 30H165M173 30L180 43.6M189 18H207M198 18V45M216 15V45M228 45V18H243M228 30H240M252 15V45M279 18H264V42H279M264 30H276M288 18V42H297Q303 42 303 36V24Q303 18 297 18ZM324 30H333Q339 30 339 36Q339 42 333 42H324V18H330Q336 18 336 24Q336 30 330 30M350.6 16.4L357 30L363.4 16.4M357 30V45M384 15V45M402 15V45M385 16.3L393 32L401 16.3M414 44.3L420.5 18H422.5L429 44.3M416.6 33H426.4M441 45V18H450Q456 18 456 24Q456 30 450 30H441M449 30L456 43.6M486 18H474Q468 18 468 24Q468 30 474 30H477Q483 30 483 36Q483 42 477 42H465M495 44.3L501.5 18H503.5L510 44.3M497.6 33H507.4M522 18V42H531Q537 42 537 36V24Q537 18 531 18ZM564 18H549V42H564M549 30H561M573 15V42H588"/>
+</svg></a>`;
+
 const FOOTER = (root) => `<footer class="site"><div class="frame row">
 <p class="m colophon-mark" aria-hidden="true">Declared</p>
 <div class="b">
 <p>${esc(INDEPENDENCE)}</p>
 <p>This site, its scanner and the checker it runs were written with substantial AI assistance. Every result except the scanner states <code>not_checkable</code> and <code>check_error</code> comes from the public checker, and most listing pages give the command that repeats the check.</p>
 <p>A result that looks wrong, or a question about this site: ${httpsLink(SITE_ISSUES, 'issues page of the site repository')}. About the checker or the spec: ${httpsLink(CHECKER_ISSUES, 'issues page of the public checker')}. <a href="${esc(root + 'method.html')}">Method and limits</a>.</p>
+<p class="maker">${MAKER_MARK}</p>
 </div>
 </div></footer>`;
 

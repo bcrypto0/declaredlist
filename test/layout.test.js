@@ -232,3 +232,22 @@ test('publisher text in a right to left script takes its direction from the text
   const css = read('style.css');
   assert.match(css, /:is\(\.entry-title, \.e-title, \.pubtext p\):dir\(rtl\) \{ font-style: normal; \}/);
 });
+
+test('the footer of every page ends with the maker mark, drawn inline and loading nothing', () => {
+  const { read, dist } = build(plainLatest());
+  const pages = ['index.html', 'method.html', 'publishers.html', '404.html', ...fs.readdirSync(path.join(dist, 'listing')).map((f) => `listing/${f}`)];
+  assert.ok(pages.length > 4);
+  for (const f of pages) {
+    const html = read(f);
+    const marks = html.match(/<a href="https:\/\/marsadel\.com\/mark\/" rel="noopener" aria-label="Certified by Marsadel">/g) || [];
+    assert.equal(marks.length, 1, `${f}: one mark`);
+    // The last row of the footer, and nowhere outside it.
+    assert.match(html, /<p class="maker"><a href="https:\/\/marsadel\.com\/mark\/"[^>]*><svg [^>]*height="20" fill="currentColor" aria-hidden="true" focusable="false">[\s\S]*?<\/svg><\/a><\/p>\n<\/div>\n<\/div><\/footer>/, f);
+    // Nothing the style policy would block, and nothing loaded.
+    assert.doesNotMatch(html, / style="/, `${f}: no inline style`);
+    const svg = html.match(/<p class="maker">[\s\S]*?<\/p>/)[0];
+    assert.doesNotMatch(svg, /<script|<image|<use|<text|url\(|xlink|src=/, `${f}: outlines only`);
+    assert.equal((svg.match(/href=/g) || []).length, 1);
+  }
+  assert.match(read('style.css'), /footer\.site \.maker a \{ color: inherit;/);
+});

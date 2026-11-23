@@ -394,7 +394,7 @@ test('the census page keeps the security policy: no script, no outside request, 
   }
   for (const m of html.matchAll(/\shref="([^"]*)"/g)) {
     const h = m[1];
-    const ok = h === '#main' || /^#[a-z][a-z0-9-]*$/.test(h) || /^https:\/\/(github\.com\/bcrypto0\/|declaredlist\.com\/)/.test(h) || /^[A-Za-z0-9._\/-]+$/.test(h) || h === './' || h === 'mailto:census@declaredlist.com';
+    const ok = h === '#main' || /^#[a-z][a-z0-9-]*$/.test(h) || /^https:\/\/(github\.com\/bcrypto0\/|declaredlist\.com\/)/.test(h) || /^[A-Za-z0-9._\/-]+$/.test(h) || h === './' || h === 'mailto:census@declaredlist.com' || h === 'https://marsadel.com/mark/';
     assert.ok(ok, `unexpected href ${h}`);
   }
   assert.match(html, /<link rel="stylesheet" href="style\.css">\n<link rel="stylesheet" href="census\.css">/);
